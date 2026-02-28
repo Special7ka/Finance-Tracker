@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { register } from "../services/auth.service";
+import { register, login } from "../services/auth.service";
 
 const router = Router();
 
 router.post("/register",async (req,res,next) =>{
     const { email, password } = req.body;
 
-    if(typeof email !== "string" || email === "" || !email.includes("@")){
+    if(typeof email !== "string" || email.trim() === "" || !email.includes("@")){
         res.status(400).json("Неверно задана почта")
         return;
     }
@@ -38,5 +38,29 @@ router.post("/register",async (req,res,next) =>{
         }
     }
 })
+
+    router.post("/login", async (req, res, next ) =>{
+        
+        const {email, password} = req.body;
+
+        if(typeof email !== "string" ||  typeof password !== "string"|| email.trim() === "" || password.trim() === ""  ){
+            res.status(400).json({message:"bad login or password"})
+            return
+        }
+
+        try{
+            const token =  await login(email,password)
+            res.status(200).json({token})
+            return
+        }catch(e){
+            if(e instanceof Error){
+                if(e.message === "Invalid credentials"){
+                    res.status(401).json({message:"Invalid credentials"})
+                    return
+                }
+                return next(e)
+            }
+        }
+    })
 
 export default router;
