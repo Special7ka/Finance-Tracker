@@ -2,11 +2,13 @@ import express from "express";
 import { notFound } from "./middlewares/notFound";
 import { errorHandler } from "./middlewares/errorHandler";
 import  debug  from "./routes/debug"
+import  authRouter  from "./routes/auth"
 
 const app = express()
 
 app.use(express.json())
 app.use(debug)
+app.use("/auth", authRouter )
 
 app.get("/health", (req,res) => { 
     res.json( {status:"ok"})
