@@ -6,11 +6,11 @@ interface AuthPayload {
   userId: number
 }
 
-export const verufJWT = (req: Request, res: Response, next: NextFunction) => { 
+export const verifyJWT = (req: Request, res: Response, next: NextFunction) => { 
 
     const token = (req as any).token
     if(!token){
-        res.status(401).json({message:"Unauthorized"})
+        res.status(401).json({"error":"Unauthorized"})
         return
     }   
     const JWT = process.env.JWT_SECRET as string
@@ -22,7 +22,7 @@ export const verufJWT = (req: Request, res: Response, next: NextFunction) => {
         next()
         return
     }catch(e){
-        res.status(401).json({message:"Unauthorized"})
+        res.status(401).json({"error":"Unauthorized"})
         return 
     } 
 }

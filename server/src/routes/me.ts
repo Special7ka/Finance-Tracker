@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { authorization } from "../middlewares/parseAuthorization";
-import { verufJWT } from "../middlewares/verifyJWT";
+import { verifyJWT } from "../middlewares/verifyJWT";
 import { getPrisma } from "../db/prisma"
  
 const router = Router()
 
-router.get("/",authorization,verufJWT, async(req,res) =>{
+router.get("/",authorization,verifyJWT, async(req,res) =>{
 
     const userId = (req as any).userId;
     const prisma = getPrisma();
@@ -19,7 +19,7 @@ router.get("/",authorization,verufJWT, async(req,res) =>{
     })
 
     if (!userInfo){
-        res.status(404).json({message: "User not found"})
+        res.status(404).json({"error": "User not found"})
         return
     }
     return res.status(200).json(userInfo)

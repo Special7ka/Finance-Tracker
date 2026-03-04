@@ -1,6 +1,6 @@
 import request from "supertest"
 import app from "../src/app"
-import { exec } from "node:child_process"
+import { getPrisma }  from "../src/db/prisma"
 
 describe("Auth smoke", ()=>{
     it("Register smoke", async ()=>{
@@ -97,4 +97,17 @@ describe("Auth smoke", ()=>{
 
         expect(res.status).toBe(400)
     })
+    it("passwordHash in db is not the same as register password ",async()=>{
+        const email = "test@test"
+        const password = "testtest"
+        const prisma = getPrisma();
+        
+        await request(app).post("/auth/register").send({email,password})
+
+        const user = await prisma.user.findUnique({where:{email}})
+        if(!user){
+            throw new Error("user did not created")
+        }
+        expect(user.passwordHash).not.toBe(password)
+    } )
 })

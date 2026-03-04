@@ -1,6 +1,6 @@
 import { Request,Response,NextFunction } from "express";
 
 export const notFound = (req : Request, res : Response, next : NextFunction ) => {
-    res.status(404).json({"message": "Rout not found"})
+    res.status(404).json({"error": "Rout not found"})
 
 }
