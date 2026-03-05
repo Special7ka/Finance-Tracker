@@ -2,8 +2,9 @@ import express from "express";
 import { notFound } from "./middlewares/notFound";
 import { errorHandler } from "./middlewares/errorHandler";
 import  debug  from "./routes/debug"
-import  authRouter  from "./routes/auth"
+import authRouter  from "./routes/auth"
 import meRouter from "./routes/me"
+import categoriesRouter from "./routes/categories"
 
 const app = express()
 
@@ -11,6 +12,7 @@ app.use(express.json())
 app.use(debug)
 app.use("/auth", authRouter )
 app.use("/me",meRouter)
+app.use("/categories",categoriesRouter)
 
 app.get("/health", (req,res) => { 
     res.json( {status:"ok"})
@@ -20,4 +22,4 @@ app.use(notFound)
 app.use(errorHandler)
 
 
-export default app
+export default app  
