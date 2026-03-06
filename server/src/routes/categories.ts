@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/verifyJWT";
+import { authorization } from "../middlewares/parseAuthorization";
 
 const router = Router();
 
-router.get("/", verifyJWT, async(req, res) =>{
+router.get("/",authorization, verifyJWT, async(req, res) =>{
     res.json([])
 })
 

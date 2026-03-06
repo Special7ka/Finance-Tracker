@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 console.log("VERIFY JWT FILE:", __filename);
 
 interface AuthPayload {
-  userId: number
+  userId: string
 }
 
 export const verifyJWT = (req: Request, res: Response, next: NextFunction) => { 
