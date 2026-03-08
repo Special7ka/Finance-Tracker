@@ -2,8 +2,28 @@ import { Router } from "express";
 import { verifyJWT } from "../middlewares/verifyJWT";
 import { authorization } from "../middlewares/parseAuthorization";
 import { getCategoriesByUserId, updateCategory } from "../services/categories.service";
+import { createCategory } from "../services/categories.service";
 
 const router = Router();
+
+router.post("/", authorization, verifyJWT, async(req, res) =>{
+    const userId = (req as any).userId;
+    const name = req.body.name
+
+    if(!name || typeof(name) !== "string" || name.trim() ===""){
+        res.status(400).json({error: "invalid name"})
+        return
+    }
+    try{
+        const newCategory = await createCategory(userId,name)
+        return  res.status(201).json({message:"successfully created", category: newCategory})
+    }catch(e){
+        if(e instanceof Error){
+            res.status(500).json({error: e.message})
+            return
+        }
+    }
+})
 
 router.get("/",authorization, verifyJWT, async(req, res) =>{
     const userId = (req as any).userId
