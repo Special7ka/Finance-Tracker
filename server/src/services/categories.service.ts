@@ -1,4 +1,6 @@
+import { PrismaClientInitializationError, PrismaClientRustPanicError } from "@prisma/client/runtime/client";
 import { getPrisma } from "../db/prisma";
+import { throws } from "assert";
 
 
 export async function getCategoriesByUserId(userId: string) {
@@ -38,4 +40,37 @@ export async function updateCategory(userId: string, categoryID: string, newName
     const newCategory =  await prisma.category.update({where:{id:categoryID}, data:{name: newName}})
 
     return newCategory;
+}
+
+export async function createCategory(userId: string, name: string){
+    const prisma = getPrisma()
+
+    const newCategory = await prisma.category.create({
+        data:{
+            userId:userId,
+            name:name,
+        }
+    })
+
+    return newCategory;
+}
+
+export async function deleteCategory(userId:string, categoryID:string){
+    const prisma = getPrisma()
+    const existingCategory = await prisma.category.findFirst({
+        where:{
+            userId:userId,
+            id:categoryID
+        }
+    })
+
+    if(existingCategory){
+    await prisma.category.delete({where:{
+        id:categoryID
+    }})
+    return;
+    } else{
+        throw new Error("Category not found")
+    }
+    
 }
