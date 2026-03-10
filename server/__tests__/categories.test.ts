@@ -25,5 +25,29 @@ import { DEFAULT_CATEGORIES } from "../src/constants/defaultCategories";
             expect(res.body.length).toBeGreaterThan(0)
             expect(responseNames).toEqual(defaultNames)
         })
+        it("POST /categories returns 201  + created category",async()=>{
+            const email = "test@test"
+            const password = "testpass"
+
+            const token = (await request(app).post("/auth/register").send({email,password})).body.token
+
+            const res = await request(app).post("/categories").set("Authorization","Bearer " + token ).send({name: "Travel"})
+
+            expect(res.status).toBe(201)
+            expect(res.body.category.id).toBeDefined()
+            expect(res.body.category.name).toBe("Travel")
+
+        })
+        it("POST /categories with invalid body 400", async()=>{
+             const email = "test@test"
+            const password = "testpass"
+
+            const token = (await request(app).post("/auth/register").send({email,password})).body.token
+
+            const res = await request(app).post("/categories").set("Authorization","Bearer " + token ).send({name: 123})
+
+            expect(res.status).toBe(400)
+            expect(res.body.error).toBe("invalid name")
+        })
 
 })
