@@ -1,6 +1,7 @@
 import request  from "supertest";
 import app from "../src/app";
 import { DEFAULT_CATEGORIES } from "../src/constants/defaultCategories";
+import { exec } from "node:child_process";
 
     describe("Categories",()=>{
         it("GET /categories without token returns 401",async ()=>{
@@ -39,7 +40,7 @@ import { DEFAULT_CATEGORIES } from "../src/constants/defaultCategories";
 
         })
         it("POST /categories with invalid body 400", async()=>{
-             const email = "test@test"
+            const email = "test@test"
             const password = "testpass"
 
             const token = (await request(app).post("/auth/register").send({email,password})).body.token
@@ -49,5 +50,49 @@ import { DEFAULT_CATEGORIES } from "../src/constants/defaultCategories";
             expect(res.status).toBe(400)
             expect(res.body.error).toBe("invalid name")
         })
+        it("PATCH /categories/:id returns 200 + updated category", async()=>{
+            const email = "test@test"
+            const password = "testpass"
+            const newName = "Travel"
 
+            const token  = (await request(app).post("/auth/register").send({email,password})).body.token
+
+            const categories = (await request(app).get("/categories").set("Authorization","Bearer " + token)).body
+            const categoryId = categories[0].id
+
+            const res = await request(app).patch("/categories/" + categoryId).set("Authorization","Bearer " + token).send({name: newName})
+
+            expect(res.status).toBe(200)
+            expect(res.body.category.name).toBe(newName)
+        })
+        it("PATCH /categories/:id invalid body returns 400",async ()=>{
+            const email = "test@test"
+            const password = "testpass"
+
+            const token  = (await request(app).post("/auth/register").send({email,password})).body.token
+
+            const categories = (await request(app).get("/categories").set("Authorization","Bearer " + token)).body
+            const categoryId = categories[0].id
+
+            const res = await request(app).patch("/categories/" + categoryId).set("Authorization","Bearer " + token).send({name: 123 })
+
+            expect(res.status).toBe(400)
+        })
+        it("PATCH /categories/:id` not owned category returns 404", async()=>{
+
+            const firstEmail = "firsttest@test"
+            const secondEmail = "secondtest@test"
+            const password = "testpass"
+
+            const token = (await request(app).post("/auth/register").send({email: firstEmail,password})).body.token
+            const token2  = (await request(app).post("/auth/register").send({email: secondEmail,password})).body.token
+
+            const categories = (await request(app).get("/categories").set("Authorization","Bearer " + token)).body
+            const categoryId = categories[0].id
+
+            const res = await request(app).patch("/categories/" + categoryId).set("Authorization","Bearer " + token2).send({name: "Sigma" })
+
+            expect(res.status).toBe(404)
+
+        })
 })
