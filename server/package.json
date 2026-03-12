@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "NODE_ENV=test vitest run",
-    "test:watch": "NODE_ENV=test vitest"
+    "test:watch": "NODE_ENV=test vitest",
+    "tree": "tree -I \"node_modules|dist|.git\" | xclip -selection clipboard"
   },
   "author": "",
   "license": "ISC",
