@@ -1,7 +1,7 @@
 import request  from "supertest";
 import app from "../src/app";
 import { DEFAULT_CATEGORIES } from "../src/constants/defaultCategories";
-import { exec } from "node:child_process";
+import { getPrisma } from "../src/db/prisma";
 
     describe("Categories",()=>{
         it("GET /categories without token returns 401",async ()=>{
@@ -94,5 +94,19 @@ import { exec } from "node:child_process";
 
             expect(res.status).toBe(404)
 
+        })
+        it("DELETE /categories/:id returns 204",async()=>{
+            const email = "test@test"
+            const password = "testpass"
+
+            const token = (await request(app).post("/auth/register").send({email,password})).body.token 
+
+            const categories = (await request(app).get("/categories").set("Authorization","Bearer " + token)).body
+            const categoryId = categories[0].id
+
+            const res = await request(app).delete("/categories/" + categoryId).set("Authorization","Bearer " + token)
+
+            expect(res.status).toBe(204)
+            expect(res.body).toEqual({})
         })
 })
