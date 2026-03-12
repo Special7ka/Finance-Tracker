@@ -2,10 +2,6 @@ import { Router } from "express";
 import { verifyJWT } from "../middlewares/verifyJWT";
 import { authorization } from "../middlewares/parseAuthorization";
 import { getCategoriesByUserId, updateCategory, createCategory, deleteCategory } from "../services/categories.service";
-import { json } from "node:stream/consumers";
-import { error } from "node:console";
-
-
 
 const router = Router();
 
