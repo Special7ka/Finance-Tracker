@@ -1,25 +1,26 @@
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
 
-let prisma: PrismaClient | null = null;
+let prisma: PrismaClient | null = null
 
 export function getPrisma() {
-  if (prisma) return prisma;
-  let url = process.env.DATABASE_URL;
+  if (prisma) return prisma
+  let url = process.env.DATABASE_URL
 
-  if(process.env.NODE_ENV === "test"){
-     url = process.env.DATABASE_URL_TEST;
+  if (process.env.NODE_ENV === 'test') {
+    url = process.env.DATABASE_URL_TEST
   }
-  console.log("Using DB:", url);
+  console.log('Using DB:', url)
 
   if (!url) {
-    throw new Error("DATABASE URL is missing. Check your .env and dotenv loading.");
+    throw new Error(
+      'DATABASE URL is missing. Check your .env and dotenv loading.',
+    )
   }
 
-  const adapter = new PrismaPg({ connectionString: url });
+  const adapter = new PrismaPg({ connectionString: url })
 
-  prisma = new PrismaClient({ adapter });
+  prisma = new PrismaClient({ adapter })
 
-
-  return prisma;
+  return prisma
 }

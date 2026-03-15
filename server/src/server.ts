@@ -1,6 +1,8 @@
-import "dotenv/config";
-import app from "./app";
+import 'dotenv/config'
+import app from './app'
 
 const PORT = 3000
 
-app.listen(PORT, ()=>{console.log(`server started at Port ${PORT}` )});
+app.listen(PORT, () => {
+  console.log(`server started at Port ${PORT}`)
+})

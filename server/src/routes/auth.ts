@@ -1,66 +1,72 @@
-    import { Router } from "express";
-    import { register, login } from "../services/auth.service";
+import { Router } from 'express'
+import { register, login } from '../services/auth.service'
 
-    const router = Router();
+const router = Router()
 
-    router.post("/register",async (req,res,next) =>{
-        const { email, password } = req.body;
+router.post('/register', async (req, res, next) => {
+  const { email, password } = req.body
 
-        if(typeof email !== "string" || email.trim() === "" || !email.includes("@")){
-            res.status(400).json({"error":"Invalid email"})
-            return;
-        }
+  if (
+    typeof email !== 'string' ||
+    email.trim() === '' ||
+    !email.includes('@')
+  ) {
+    res.status(400).json({ error: 'Invalid email' })
+    return
+  }
 
-        if( typeof password !== "string" ) {
-            res.status(400).json({"error":"Invalid password"})
-            return;
-        }  
+  if (typeof password !== 'string') {
+    res.status(400).json({ error: 'Invalid password' })
+    return
+  }
 
-        if( password.length < 6){
-            res.status(400).json({"error":"Password must be at least 6 characters"})
-            return;
-        }
+  if (password.length < 6) {
+    res.status(400).json({ error: 'Password must be at least 6 characters' })
+    return
+  }
 
-        try{
-        
-        const token  = await register(email,password)
-        
-        res.status(201).json({token})
-        return;
-        
-        } catch(e){
-            if(e instanceof Error){
-                if(e.message === "User already exists"){
-                res.status(409).json({error: e.message})
-                return
-                }
-                return next(e)
-            }
-        }
-    })
+  try {
+    const token = await register(email, password)
 
-        router.post("/login", async (req, res, next ) =>{
-            
-            const {email, password} = req.body;
+    res.status(201).json({ token })
+    return
+  } catch (e) {
+    if (e instanceof Error) {
+      if (e.message === 'User already exists') {
+        res.status(409).json({ error: e.message })
+        return
+      }
+      return next(e)
+    }
+  }
+})
 
-            if(typeof email !== "string" ||  typeof password !== "string"|| email.trim() === "" || password.trim() === ""  ){
-                res.status(400).json({"error":"Invalid login or password"})
-                return
-            }
+router.post('/login', async (req, res, next) => {
+  const { email, password } = req.body
 
-            try{
-                const token =  await login(email,password)
-                res.status(200).json({token})
-                return
-            }catch(e){
-                if(e instanceof Error){
-                    if(e.message === "Invalid credentials"){
-                        res.status(401).json({"error":"Invalid credentials"})
-                        return
-                    }
-                    return next(e)
-                }
-            }
-        })
+  if (
+    typeof email !== 'string' ||
+    typeof password !== 'string' ||
+    email.trim() === '' ||
+    password.trim() === ''
+  ) {
+    res.status(400).json({ error: 'Invalid login or password' })
+    return
+  }
 
-    export default router;
+  try {
+    const token = await login(email, password)
+    res.status(200).json({ token })
+    return
+  } catch (e) {
+    if (e instanceof Error) {
+      if (e.message === 'Invalid credentials') {
+        res.status(401).json({ error: 'Invalid credentials' })
+        return
+      }
+      return next(e)
+    }
+  }
+})
+
+export default router

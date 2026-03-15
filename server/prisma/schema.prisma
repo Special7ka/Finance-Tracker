@@ -1,48 +1,48 @@
-generator client {
-  provider = "prisma-client-js"
-}
+    generator client {
+      provider = "prisma-client-js"
+    }
 
-enum TransactionType {
-  INCOME
-  EXPENSE
-}
+    enum TransactionType {
+      INCOME
+      EXPENSE
+    }
 
-datasource db {
-  provider = "postgresql"
-}
+    datasource db {
+      provider = "postgresql"
+    }
 
-model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  passwordHash String
-  createdAt    DateTime @default(now())
+    model User {
+      id           String   @id @default(uuid())
+      email        String   @unique
+      passwordHash String
+      createdAt    DateTime @default(now())
 
-  categories   Category[]
-  transactions Transaction[]
-}
+      categories   Category[]
+      transactions Transaction[]
+    }
 
-model Category {
-  id        String   @id @default(uuid())
-  name      String
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+    model Category {
+      id        String   @id @default(uuid())
+      name      String
+      userId    String
+      user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+      createdAt DateTime @default(now())
+      updatedAt DateTime @updatedAt
 
-  transactions Transaction[]
+      transactions Transaction[]
 
-  @@unique([userId, name])
-}
+      @@unique([userId, name])
+    }
 
-model Transaction {
-  id         String          @id @default(uuid())
-  amount     Int
-  type       TransactionType
-  occurredAt DateTime
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
-  userId     String
-  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  categoryId String?
-  category   Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-}
+    model Transaction {
+      id         String          @id @default(uuid())
+      amount     Int
+      type       TransactionType
+      occurredAt DateTime
+      createdAt  DateTime        @default(now())
+      updatedAt  DateTime        @updatedAt
+      userId     String
+      user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+      categoryId String?
+      category   Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+    }
