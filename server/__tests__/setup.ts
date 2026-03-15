@@ -1,8 +1,8 @@
-import "dotenv/config";
-import { beforeEach, afterAll } from "vitest";
-import { getPrisma } from "../src/db/prisma";
+import 'dotenv/config'
+import { beforeEach, afterAll } from 'vitest'
+import { getPrisma } from '../src/db/prisma'
 
-const prisma = getPrisma();
+const prisma = getPrisma()
 
 beforeEach(async () => {
   await prisma.$executeRawUnsafe(`
@@ -20,9 +20,9 @@ beforeEach(async () => {
           || ' RESTART IDENTITY CASCADE';
       END LOOP;
     END $$;
-  `);
-});
+  `)
+})
 
 afterAll(async () => {
-  await prisma.$disconnect();
-});
+  await prisma.$disconnect()
+})
