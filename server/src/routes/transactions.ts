@@ -49,7 +49,10 @@ router.post("/",authorization,verifyJWT,async(req,res)=>{
     }
 })
 router.get("/",authorization,verifyJWT,async(req,res)=>{
-    
+    const userId = (req as any).userId
+    const transactions = await getTransactions(userId)
+
+    return res.status(200).json({transactions})
 })
 router.patch("/:id",authorization,verifyJWT,async(req,res)=>{
     

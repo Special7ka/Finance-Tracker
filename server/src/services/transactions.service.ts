@@ -11,7 +11,7 @@ export async function createTransaction(userId:string,type: TransactionType,occu
         }})
 
         if(userId !==category?.userId){
-            throw new Error("category not found")
+            throw new Error("Category not found")
         }
     }
     
@@ -25,12 +25,21 @@ export async function createTransaction(userId:string,type: TransactionType,occu
 
     return newTransaction;
 }
-export async function getTransactions(userId:string,categoryId:string ) {
+
+export async function getTransactions(userId:string ) {
     const prisma = getPrisma()
+
+    const transactions =  await prisma.transaction.findMany({where:{userId:userId},  orderBy:{
+            occurredAt: "desc"
+        }})
+
+    return transactions
 }
+
 export async function updateTransaction(userId:string,transactionId:string) {
     const prisma = getPrisma()
 }
+
 export async function deleteTransaction(userId:string,transactionId:string) {
     const prisma = getPrisma()
 }
