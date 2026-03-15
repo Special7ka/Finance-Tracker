@@ -20,7 +20,7 @@ export async function createTransaction(userId:string,type: TransactionType,occu
         type:type,
         occurredAt:occurredAt,
         categoryId:categoryId,
-        amount:amount,
+        amount:amount
     }})
 
     return newTransaction;

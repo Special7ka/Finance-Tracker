@@ -40,8 +40,12 @@ router.post("/",authorization,verifyJWT,async(req,res)=>{
         return res.status(201).json({transaction})
     }catch(e){
         if(e instanceof Error){
-            res.status(400).json({error: e.message})
+            if(e.message === "Category not found"){
+                return res.status(404).json({error: e.message})
+            }
+            return res.status(500).json({error: "Internal server error"})
         }
+        return
     }
 })
 router.get("/",authorization,verifyJWT,async(req,res)=>{
