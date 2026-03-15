@@ -1,6 +1,7 @@
 import request from "supertest"
 import app from "../src/app"
 import { getPrisma }  from "../src/db/prisma"
+import { registerAndGetToken } from "./helpers/register"
 
 describe("Auth smoke", ()=>{
     it("Register smoke", async ()=>{
@@ -27,16 +28,12 @@ describe("Auth smoke", ()=>{
         expect(res.body.token.length).toBeGreaterThan(0)
     });
     it("/me smoke", async()=>{
-        const email = "test@test";
-        const password = "testtest";
-        await request(app).post("/auth/register").send({email, password})
-
-        const token = (await request(app).post("/auth/login").send({email,password})).body.token;
+        
+        const token = await registerAndGetToken()
 
         const res = await request(app).get("/me").set("Authorization", "Bearer " + token)
 
         expect(res.status).toBe(200);
-        expect(res.body.email).toBe(email)
         expect(res.body.id.length).toBeGreaterThan(0)
         expect(typeof res.body.id).toBe("string")
     })

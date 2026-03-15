@@ -1,7 +1,7 @@
 import request  from "supertest";
 import app from "../src/app";
 import { DEFAULT_CATEGORIES } from "../src/constants/defaultCategories";
-import { getPrisma } from "../src/db/prisma";
+import { registerAndGetToken } from "./helpers/register";
 
     describe("Categories",()=>{
         it("GET /categories without token returns 401",async ()=>{
@@ -11,10 +11,7 @@ import { getPrisma } from "../src/db/prisma";
             expect(res.body.error).toBeDefined()
         })
         it("GET /categories returns 200 and returns default categories after register", async()=>{
-            const email = "test@test"
-            const password = "testpass"
-
-            const token  = (await request(app).post("/auth/register").send({email,password})).body.token
+            const token = await registerAndGetToken()
 
             const res = await request(app).get("/categories").set("Authorization", "Bearer " + token)
             const responseNames = res.body.map((c: any) => c.name).sort()
@@ -27,10 +24,7 @@ import { getPrisma } from "../src/db/prisma";
             expect(responseNames).toEqual(defaultNames)
         })
         it("POST /categories returns 201  + created category",async()=>{
-            const email = "test@test"
-            const password = "testpass"
-
-            const token = (await request(app).post("/auth/register").send({email,password})).body.token
+            const token = await registerAndGetToken()
 
             const res = await request(app).post("/categories").set("Authorization","Bearer " + token ).send({name: "Travel"})
 
@@ -40,10 +34,7 @@ import { getPrisma } from "../src/db/prisma";
 
         })
         it("POST /categories with invalid body 400", async()=>{
-            const email = "test@test"
-            const password = "testpass"
-
-            const token = (await request(app).post("/auth/register").send({email,password})).body.token
+            const token = await registerAndGetToken()
 
             const res = await request(app).post("/categories").set("Authorization","Bearer " + token ).send({name: 123})
 
@@ -51,11 +42,9 @@ import { getPrisma } from "../src/db/prisma";
             expect(res.body.error).toBe("invalid name")
         })
         it("PATCH /categories/:id returns 200 + updated category", async()=>{
-            const email = "test@test"
-            const password = "testpass"
-            const newName = "Travel"
+            const token = await registerAndGetToken()
 
-            const token  = (await request(app).post("/auth/register").send({email,password})).body.token
+            const newName = "Travel"
 
             const categories = (await request(app).get("/categories").set("Authorization","Bearer " + token)).body
             const categoryId = categories[0].id
@@ -66,10 +55,7 @@ import { getPrisma } from "../src/db/prisma";
             expect(res.body.category.name).toBe(newName)
         })
         it("PATCH /categories/:id invalid body returns 400",async ()=>{
-            const email = "test@test"
-            const password = "testpass"
-
-            const token  = (await request(app).post("/auth/register").send({email,password})).body.token
+            const token = await registerAndGetToken()
 
             const categories = (await request(app).get("/categories").set("Authorization","Bearer " + token)).body
             const categoryId = categories[0].id
@@ -96,10 +82,7 @@ import { getPrisma } from "../src/db/prisma";
 
         })
         it("DELETE /categories/:id returns 204",async()=>{
-            const email = "test@test"
-            const password = "testpass"
-
-            const token = (await request(app).post("/auth/register").send({email,password})).body.token 
+            const token = await registerAndGetToken()
 
             const categories = (await request(app).get("/categories").set("Authorization","Bearer " + token)).body
             const categoryId = categories[0].id
