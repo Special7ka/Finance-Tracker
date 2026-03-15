@@ -1,6 +1,4 @@
-import { PrismaClientInitializationError, PrismaClientRustPanicError } from "@prisma/client/runtime/client";
 import { getPrisma } from "../db/prisma";
-import { throws } from "assert";
 
 
 export async function getCategoriesByUserId(userId: string) {
@@ -69,6 +67,7 @@ export async function deleteCategory(userId:string, categoryID:string){
         id:categoryID
     }})
     return;
+    
     } else{
         throw new Error("Category not found")
     }

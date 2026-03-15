@@ -29,9 +29,12 @@ export async function createTransaction(userId:string,type: TransactionType,occu
 export async function getTransactions(userId:string ) {
     const prisma = getPrisma()
 
-    const transactions =  await prisma.transaction.findMany({where:{userId:userId},  orderBy:{
+    const transactions =  await prisma.transaction.findMany({
+        where:{
+            userId:userId
+    },  orderBy:{
             occurredAt: "desc"
-        }})
+    }})
 
     return transactions
 }
