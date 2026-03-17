@@ -74,21 +74,8 @@ describe('Categories', () => {
     expect(res.status).toBe(400)
   })
   it('PATCH /categories/:id` not owned category returns 404', async () => {
-    const firstEmail = 'firsttest@test'
-    const secondEmail = 'secondtest@test'
-    const password = 'testpass'
-
-    const token = (
-      await request(app)
-        .post('/auth/register')
-        .send({ email: firstEmail, password })
-    ).body.token
-
-    const token2 = (
-      await request(app)
-        .post('/auth/register')
-        .send({ email: secondEmail, password })
-    ).body.token
+    const token = await registerAndGetToken()
+    const token2 = await registerAndGetToken()
 
     const categoryId = await getFirstUserCategory(token)
 
