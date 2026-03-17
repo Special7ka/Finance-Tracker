@@ -2,6 +2,7 @@ import request from 'supertest'
 import app from '../src/app'
 import { registerAndGetToken } from './helpers/register'
 import { getFirstUserCategory } from './helpers/categories'
+import { createAndGetTransaction } from './helpers/transactions'
 
 describe('Transactions', () => {
   it('POST /transactions create new transaction and return 201 ', async () => {
@@ -45,20 +46,10 @@ describe('Transactions', () => {
     expect(res.status).toBe(400)
     expect(res.body.error).toBeDefined()
   })
-  it('GET /transactions return 200 and transaction list', async () => {
-    const type = 'EXPENSE'
-    const occurredAt = new Date().toISOString()
-    const amount = 100
 
+  it('GET /transactions returns 200 and transaction list', async () => {
     const token = await registerAndGetToken()
-    const categoryId = await getFirstUserCategory(token)
-
-    const sendTx = await request(app)
-      .post('/transactions')
-      .send({ categoryId, amount, occurredAt, type })
-      .set('Authorization', 'Bearer ' + token)
-
-    const createdTx = sendTx.body.transaction
+    const createdTx = await createAndGetTransaction(token)
 
     const res = await request(app)
       .get('/transactions')
