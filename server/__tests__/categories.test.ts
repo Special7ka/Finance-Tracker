@@ -2,6 +2,7 @@ import request from 'supertest'
 import app from '../src/app'
 import { DEFAULT_CATEGORIES } from '../src/constants/defaultCategories'
 import { registerAndGetToken } from './helpers/register'
+import { getFirstUserCategory } from './helpers/categories'
 
 describe('Categories', () => {
   it('GET /categories without token returns 401', async () => {
@@ -49,15 +50,9 @@ describe('Categories', () => {
   })
   it('PATCH /categories/:id returns 200 + updated category', async () => {
     const token = await registerAndGetToken()
+    const categoryId = await getFirstUserCategory(token)
 
     const newName = 'Travel'
-
-    const categories = (
-      await request(app)
-        .get('/categories')
-        .set('Authorization', 'Bearer ' + token)
-    ).body
-    const categoryId = categories[0].id
 
     const res = await request(app)
       .patch('/categories/' + categoryId)
@@ -69,13 +64,7 @@ describe('Categories', () => {
   })
   it('PATCH /categories/:id invalid body returns 400', async () => {
     const token = await registerAndGetToken()
-
-    const categories = (
-      await request(app)
-        .get('/categories')
-        .set('Authorization', 'Bearer ' + token)
-    ).body
-    const categoryId = categories[0].id
+    const categoryId = await getFirstUserCategory(token)
 
     const res = await request(app)
       .patch('/categories/' + categoryId)
@@ -94,18 +83,14 @@ describe('Categories', () => {
         .post('/auth/register')
         .send({ email: firstEmail, password })
     ).body.token
+
     const token2 = (
       await request(app)
         .post('/auth/register')
         .send({ email: secondEmail, password })
     ).body.token
 
-    const categories = (
-      await request(app)
-        .get('/categories')
-        .set('Authorization', 'Bearer ' + token)
-    ).body
-    const categoryId = categories[0].id
+    const categoryId = await getFirstUserCategory(token)
 
     const res = await request(app)
       .patch('/categories/' + categoryId)
@@ -116,13 +101,7 @@ describe('Categories', () => {
   })
   it('DELETE /categories/:id returns 204', async () => {
     const token = await registerAndGetToken()
-
-    const categories = (
-      await request(app)
-        .get('/categories')
-        .set('Authorization', 'Bearer ' + token)
-    ).body
-    const categoryId = categories[0].id
+    const categoryId = await getFirstUserCategory(token)
 
     const res = await request(app)
       .delete('/categories/' + categoryId)

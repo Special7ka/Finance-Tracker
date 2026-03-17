@@ -1,8 +1,7 @@
 import request from 'supertest'
 import app from '../src/app'
-import { getPrisma } from '../src/db/prisma'
 import { registerAndGetToken } from './helpers/register'
-import { addAbortListener } from 'node:events'
+import { getFirstUserCategory } from './helpers/categories'
 
 describe('Transactions', () => {
   it('POST /transactions create new transaction and return 201 ', async () => {
@@ -11,13 +10,7 @@ describe('Transactions', () => {
     const amount = 100
 
     const token = await registerAndGetToken()
-
-    const categories = (
-      await request(app)
-        .get('/categories')
-        .set('Authorization', 'Bearer ' + token)
-    ).body
-    const categoryId = categories[0].id
+    const categoryId = await getFirstUserCategory(token)
 
     const res = await request(app)
       .post('/transactions')
@@ -42,13 +35,7 @@ describe('Transactions', () => {
     const amount = -100
 
     const token = await registerAndGetToken()
-
-    const categories = (
-      await request(app)
-        .get('/categories')
-        .set('Authorization', 'Bearer ' + token)
-    ).body
-    const categoryId = categories[0].id
+    const categoryId = await getFirstUserCategory(token)
 
     const res = await request(app)
       .post('/transactions')
@@ -64,14 +51,7 @@ describe('Transactions', () => {
     const amount = 100
 
     const token = await registerAndGetToken()
-
-    const categories = (
-      await request(app)
-        .get('/categories')
-        .set('Authorization', 'Bearer ' + token)
-    ).body
-
-    const categoryId = categories[0].id
+    const categoryId = await getFirstUserCategory(token)
 
     const sendTx = await request(app)
       .post('/transactions')
