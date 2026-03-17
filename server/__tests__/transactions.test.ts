@@ -58,4 +58,40 @@ describe('Transactions', () => {
     expect(res.status).toBe(400)
     expect(res.body.error).toBeDefined()
   })
+  it('GET /transactions return 200 and transaction list', async () => {
+    const type = 'EXPENSE'
+    const occurredAt = new Date().toISOString()
+    const amount = 100
+
+    const token = await registerAndGetToken()
+
+    const categories = (
+      await request(app)
+        .get('/categories')
+        .set('Authorization', 'Bearer ' + token)
+    ).body
+
+    const categoryId = categories[0].id
+
+    const sendTx = await request(app)
+      .post('/transactions')
+      .send({ categoryId, amount, occurredAt, type })
+      .set('Authorization', 'Bearer ' + token)
+
+    const createdTx = sendTx.body.transaction
+
+    const res = await request(app)
+      .get('/transactions')
+      .set('Authorization', 'Bearer ' + token)
+
+    const tx = res.body.transactions[0]
+
+    expect(res.status).toBe(200)
+    expect(res.body.transactions).toBeInstanceOf(Array)
+    expect(res.body.transactions.length).toBe(1)
+
+    expect(tx.id).toBe(createdTx.id)
+    expect(tx.amount).toBe(createdTx.amount)
+    expect(tx.type).toBe(createdTx.type)
+  })
 })
