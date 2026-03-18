@@ -50,8 +50,41 @@ export async function getTransactions(userId: string) {
   return transactions
 }
 
-export async function updateTransaction(userId: string, transactionId: string) {
+export async function updateTransaction(
+  userId: string,
+  transactionId: string,
+  data: any,
+) {
   const prisma = getPrisma()
+
+  const transaction = await prisma.transaction.findUnique({
+    where: {
+      id: transactionId,
+    },
+  })
+  if (data.categoryId !== undefined) {
+    const category = await prisma.category.findUnique({
+      where: {
+        id: data.categoryId,
+      },
+    })
+    if (category?.userId !== userId) {
+      throw new Error('Category not found')
+    }
+  }
+
+  if (!transaction || transaction.userId !== userId) {
+    throw new Error('Transaction not found')
+  }
+
+  const newTransaction = await prisma.transaction.update({
+    where: {
+      id: transactionId,
+    },
+    data: data,
+  })
+
+  return newTransaction
 }
 
 export async function deleteTransaction(userId: string, transactionId: string) {

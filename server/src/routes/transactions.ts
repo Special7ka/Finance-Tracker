@@ -13,11 +13,8 @@ const router = Router()
 
 router.post('/', authorization, verifyJWT, async (req, res) => {
   const userId = (req as any).userId
-  const amount = req.body.amount
-  const occurredAt = req.body.occurredAt
+  const { amount, type, occurredAt, categoryId } = req.body
   const occurredDate = new Date(occurredAt)
-  const categoryId = req.body.categoryId
-  const type = req.body.type
 
   if (!amount || typeof amount !== 'number' || amount <= 0) {
     return res.status(400).json({ error: 'invalid amount' })
@@ -66,7 +63,67 @@ router.get('/', authorization, verifyJWT, async (req, res) => {
   return res.status(200).json({ transactions })
 })
 
-router.patch('/:id', authorization, verifyJWT, async (req, res) => {})
+router.patch('/:id', authorization, verifyJWT, async (req, res) => {
+  const userId = (req as any).userId
+  const { amount, type, occurredAt, categoryId } = req.body
+  const transactionId = Array.isArray(req.params.id)
+    ? req.params.id[0]
+    : req.params.id
+
+  const data: any = {}
+
+  if (amount !== undefined) {
+    if (amount < 1) {
+      res.status(400).json({ error: 'invalid amount' })
+      return
+    }
+    data.amount = amount
+  }
+  if (type !== undefined) {
+    if (type !== 'INCOME' && type !== 'EXPENSE') {
+      res.status(400).json({ error: 'invalid type' })
+      return
+    }
+    data.type = type
+  }
+  if (occurredAt !== undefined) {
+    const occurredDate = new Date(occurredAt)
+    if (Number.isNaN(occurredDate.getTime())) {
+      res.status(400).json({ error: 'invalid occurredAt' })
+      return
+    }
+    data.occurredAt = occurredDate
+  }
+  if (categoryId !== undefined) {
+    if (categoryId === '') {
+      res.status(400).json({ error: 'invalid categoryId' })
+      return
+    }
+    data.categoryId = categoryId
+  }
+
+  if (Object.keys(data).length === 0) {
+    res.status(400).json({ error: 'invalid data' })
+    return
+  }
+
+  try {
+    const transaction = await updateTransaction(userId, transactionId, data)
+    return res.status(200).json({ transaction })
+  } catch (e) {
+    if (e instanceof Error) {
+      if (e.message === 'Transaction not found') {
+        res.status(404).json({ error: 'Transaction not found' })
+        return
+      }
+      if (e.message === 'Category not found') {
+        res.status(404).json({ error: 'Category not found' })
+        return
+      }
+    }
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+})
 
 router.delete('/:id', authorization, verifyJWT, async (req, res) => {})
 
