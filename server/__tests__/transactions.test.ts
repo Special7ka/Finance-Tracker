@@ -3,6 +3,7 @@ import app from '../src/app'
 import { registerAndGetToken } from './helpers/register'
 import { getFirstUserCategory } from './helpers/categories'
 import { createAndGetTransaction } from './helpers/transactions'
+import { Transaction } from '@prisma/client'
 
 describe('Transactions', () => {
   it('POST /transactions create new transaction and return 201 ', async () => {
@@ -64,5 +65,89 @@ describe('Transactions', () => {
     expect(tx.id).toBe(createdTx.id)
     expect(tx.amount).toBe(createdTx.amount)
     expect(tx.type).toBe(createdTx.type)
+  })
+  it('PATCH /transactions/:id return 200 and updated transactions', async () => {
+    const token = await registerAndGetToken()
+    const createdTx = await createAndGetTransaction(token)
+    const newBody = {
+      amount: 50,
+    }
+
+    const res = await request(app)
+      .patch('/transactions/' + createdTx.id)
+      .set('Authorization', 'Bearer ' + token)
+      .send(newBody)
+
+    const updatedTxList = await request(app)
+      .get('/transactions')
+      .set('Authorization', 'Bearer ' + token)
+
+    const updatedTx = updatedTxList.body.transactions.find(
+      (tx: Transaction) => tx.id === createdTx.id,
+    )
+
+    if (!updatedTx) {
+      throw new Error('Updated transaction not found')
+    }
+
+    expect(res.status).toBe(200)
+    expect(res.body.transaction.amount).toBe(50)
+    expect(updatedTx.amount).toBe(50)
+  })
+  it('PATCH /transactions/:id with empty body returns 400', async () => {
+    const token = await registerAndGetToken()
+    const createdTx = await createAndGetTransaction(token)
+    const newBody = {}
+
+    const res = await request(app)
+      .patch('/transactions/' + createdTx.id)
+      .set('Authorization', 'Bearer ' + token)
+      .send(newBody)
+
+    expect(res.status).toBe(400)
+    expect(res.body).toEqual({ error: 'invalid data' })
+  })
+  it('PATCH /transactions/:id with invalid data returns 400', async () => {
+    const token = await registerAndGetToken()
+    const createdTx = await createAndGetTransaction(token)
+    const newBody = {
+      amount: -50,
+    }
+
+    const res = await request(app)
+      .patch('/transactions/' + createdTx.id)
+      .set('Authorization', 'Bearer ' + token)
+      .send(newBody)
+
+    expect(res.status).toBe(400)
+    expect(res.body).toEqual({ error: 'invalid amount' })
+  })
+  it('PATCH /transactions/:id without invalit token returns 401', async () => {
+    const token = await registerAndGetToken()
+    const createdTx = await createAndGetTransaction(token)
+    const newBody = {
+      amount: 100,
+    }
+
+    const res = await request(app)
+      .patch('/transactions/' + createdTx.id)
+      .send(newBody)
+
+    expect(res.status).toBe(401)
+    expect(res.body).toEqual({ error: 'Unauthorized' })
+  })
+  it('PATCH /transactions/:id returns 404 when transaction does not exist', async () => {
+    const token = await registerAndGetToken()
+    const newBody = {
+      amount: 100,
+    }
+
+    const res = await request(app)
+      .patch('/transactions/' + '100')
+      .set('Authorization', 'Bearer ' + token)
+      .send(newBody)
+
+    expect(res.status).toBe(404)
+    expect(res.body).toEqual({ error: 'Transaction not found' })
   })
 })
