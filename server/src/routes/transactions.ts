@@ -125,6 +125,24 @@ router.patch('/:id', authorization, verifyJWT, async (req, res) => {
   }
 })
 
-router.delete('/:id', authorization, verifyJWT, async (req, res) => {})
+router.delete('/:id', authorization, verifyJWT, async (req, res) => {
+  const transactionId = Array.isArray(req.params.id)
+    ? req.params.id[0]
+    : req.params.id
+  const userId = (req as any).userId
+
+  try {
+    await deleteTransaction(userId, transactionId)
+    return res.status(204).send()
+  } catch (e) {
+    if (e instanceof Error) {
+      if (e.message === 'transaction not found') {
+        res.status(404).json({ error: 'transaction not found' })
+        return
+      }
+    }
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+})
 
 export default router

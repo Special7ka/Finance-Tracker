@@ -89,4 +89,22 @@ export async function updateTransaction(
 
 export async function deleteTransaction(userId: string, transactionId: string) {
   const prisma = getPrisma()
+
+  const existingTransaction = await prisma.transaction.findFirst({
+    where: {
+      userId: userId,
+      id: transactionId,
+    },
+  })
+
+  if (existingTransaction) {
+    await prisma.transaction.delete({
+      where: {
+        id: transactionId,
+      },
+    })
+    return
+  } else {
+    throw new Error('Transaction not found')
+  }
 }
