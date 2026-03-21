@@ -4,6 +4,7 @@ import { registerAndGetToken } from './helpers/register'
 import { getFirstUserCategory } from './helpers/categories'
 import { createAndGetTransaction } from './helpers/transactions'
 import { Transaction } from '@prisma/client'
+import { randomUUID } from 'crypto'
 
 describe('Transactions', () => {
   it('POST /transactions create new transaction and return 201 ', async () => {
@@ -149,5 +150,43 @@ describe('Transactions', () => {
 
     expect(res.status).toBe(404)
     expect(res.body).toEqual({ error: 'Transaction not found' })
+  })
+  it('DELETE /transactions/:id return 204 and delete transactions', async () => {
+    const token = await registerAndGetToken()
+    const createdTx = await createAndGetTransaction(token)
+
+    const res = await request(app)
+      .delete('/transactions/' + createdTx.id)
+      .set('Authorization', 'Bearer ' + token)
+    const exicstCheck = await request(app)
+      .get('/transactions')
+      .set('Authorization', 'Bearer ' + token)
+
+    expect(res.status).toBe(204)
+    expect(
+      exicstCheck.body.transactions.find((tx: any) => tx.id === createdTx.id),
+    ).toBe(undefined)
+  })
+
+  it('DELETE /transactions/:id with invalid transaction id return 404', async () => {
+    const token = await registerAndGetToken()
+
+    const res = await request(app)
+      .delete('/transactions/' + randomUUID())
+      .set('Authorization', 'Bearer ' + token)
+
+    expect(res.status).toBe(404)
+  })
+
+  it('DELETE /transactions/:id with invalid userId', async () => {
+    const token = await registerAndGetToken()
+    const token2 = await registerAndGetToken()
+    const createdTx = await createAndGetTransaction(token)
+
+    const res = await request(app)
+      .delete('/transactions/' + createdTx.id)
+      .set('Authorization', 'Bearer ' + token2)
+
+    expect(res.status).toBe(404)
   })
 })
