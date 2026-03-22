@@ -8,6 +8,7 @@ import {
   deleteTransaction,
 } from '../services/transactions.service'
 import { json } from 'node:stream/consumers'
+import { TransactionType } from '@prisma/client'
 
 const router = Router()
 
@@ -58,7 +59,18 @@ router.post('/', authorization, verifyJWT, async (req, res) => {
 
 router.get('/', authorization, verifyJWT, async (req, res) => {
   const userId = (req as any).userId
-  const transactions = await getTransactions(userId)
+  const rawType = Array.isArray(req.query.type)
+    ? req.query.type[0]
+    : req.query.type
+  let type: TransactionType | undefined
+
+  if (rawType) {
+    if (rawType !== 'INCOME' && rawType !== 'EXPENSE') {
+      return res.status(400).json({ error: 'Invalid type' })
+    }
+    type = rawType as TransactionType
+  }
+  const transactions = await getTransactions(userId, { type })
 
   return res.status(200).json({ transactions })
 })
@@ -136,8 +148,8 @@ router.delete('/:id', authorization, verifyJWT, async (req, res) => {
     return res.status(204).send()
   } catch (e) {
     if (e instanceof Error) {
-      if (e.message === 'transaction not found') {
-        res.status(404).json({ error: 'transaction not found' })
+      if (e.message === 'Transaction not found') {
+        res.status(404).json({ error: 'Transaction not found' })
         return
       }
     }

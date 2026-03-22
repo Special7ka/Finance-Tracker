@@ -35,13 +35,19 @@ export async function createTransaction(
   return newTransaction
 }
 
-export async function getTransactions(userId: string) {
+export async function getTransactions(
+  userId: string,
+  query: { type?: TransactionType },
+) {
   const prisma = getPrisma()
+  let where: { userId: string; type?: TransactionType } = { userId: userId }
+
+  if (query.type) {
+    where.type = query.type
+  }
 
   const transactions = await prisma.transaction.findMany({
-    where: {
-      userId: userId,
-    },
+    where,
     orderBy: {
       occurredAt: 'desc',
     },
