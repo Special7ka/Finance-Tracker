@@ -67,6 +67,83 @@ describe('Transactions', () => {
     expect(tx.amount).toBe(createdTx.amount)
     expect(tx.type).toBe(createdTx.type)
   })
+  it('GET /transactions with invalid token returns 401', async () => {
+    const invalidToken = 'Invalid'
+
+    const res = await request(app)
+      .get('/transactions')
+      .set('Authorization', 'Bearer ' + invalidToken)
+
+    expect(res.status).toBe(401)
+  })
+  it('GET /transactions without token returns 401', async () => {
+    const res = await request(app).get('/transactions')
+
+    expect(res.status).toBe(401)
+  })
+  it('GET /transactions with invalid type filter returns 400', async () => {
+    const token = await registerAndGetToken()
+    const errorParam = 'Error'
+
+    const res = await request(app)
+      .get('/transactions?type=' + errorParam)
+      .set('Authorization', 'Bearer ' + token)
+
+    expect(res.status).toBe(400)
+    expect(res.body.error).toEqual('Invalid type')
+  })
+
+  it('GET /transactions with type filter returns 200 and filtered transactions', async () => {
+    const token = await registerAndGetToken()
+
+    const createdIncomeTx = await createAndGetTransaction(token, {
+      type: 'INCOME',
+    })
+    const createdExpenseTx = await createAndGetTransaction(token, {
+      type: 'EXPENSE',
+    })
+
+    const res = await request(app)
+      .get('/transactions?type=INCOME')
+      .set('Authorization', 'Bearer ' + token)
+
+    const tx = res.body.transactions.find(
+      (t: any) => t.id === createdIncomeTx.id,
+    )
+
+    expect(res.status).toBe(200)
+    expect(res.body.transactions).toHaveLength(1)
+
+    expect(tx).toBeDefined()
+    expect(tx.type).toBe('INCOME')
+    expect(tx.amount).toBe(createdIncomeTx.amount)
+  })
+  it('GET /transactions without INCOME transactions returns empty massive', async () => {
+    const token = await registerAndGetToken()
+
+    const res = await request(app)
+      .get('/transactions?type=INCOME')
+      .set('Authorization', 'Bearer ' + token)
+
+    expect(res.status).toBe(200)
+    expect(res.body.transactions).toEqual([])
+  })
+  it('GET /transactions with another users token returns empty massive', async () => {
+    const token = await registerAndGetToken()
+    const token2 = await registerAndGetToken()
+
+    const tx1 = await createAndGetTransaction(token, { type: 'INCOME' })
+
+    const res = await request(app)
+      .get('/transactions?type=INCOME')
+      .set('Authorization', 'Bearer ' + token2)
+
+    expect(res.status).toBe(200)
+    expect(res.body.transactions).toEqual([])
+    expect(
+      res.body.transactions.find((t: any) => t.id === tx1.id),
+    ).toBeUndefined()
+  })
   it('PATCH /transactions/:id return 200 and updated transactions', async () => {
     const token = await registerAndGetToken()
     const createdTx = await createAndGetTransaction(token)
@@ -123,7 +200,7 @@ describe('Transactions', () => {
     expect(res.status).toBe(400)
     expect(res.body).toEqual({ error: 'invalid amount' })
   })
-  it('PATCH /transactions/:id without invalit token returns 401', async () => {
+  it('PATCH /transactions/:id without valid token returns 401', async () => {
     const token = await registerAndGetToken()
     const createdTx = await createAndGetTransaction(token)
     const newBody = {
