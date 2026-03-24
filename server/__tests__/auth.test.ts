@@ -18,6 +18,7 @@ describe('Auth smoke', () => {
   it('Login smoke', async () => {
     const email = 'test@test'
     const password = 'testtest'
+
     await request(app).post('/auth/register').send({ email, password })
 
     const res = await request(app).post('/auth/login').send({ email, password })
@@ -29,6 +30,7 @@ describe('Auth smoke', () => {
   it('/me smoke', async () => {
     const email = 'test@test'
     const password = 'testtest'
+    
     await request(app).post('/auth/register').send({ email, password })
 
     const token = (

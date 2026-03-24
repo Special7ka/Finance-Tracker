@@ -59,18 +59,29 @@ router.post('/', authorization, verifyJWT, async (req, res) => {
 
 router.get('/', authorization, verifyJWT, async (req, res) => {
   const userId = (req as any).userId
+
   const rawType = Array.isArray(req.query.type)
     ? req.query.type[0]
     : req.query.type
   let type: TransactionType | undefined
-
-  if (rawType) {
+  if (rawType !== undefined) {
     if (rawType !== 'INCOME' && rawType !== 'EXPENSE') {
       return res.status(400).json({ error: 'Invalid type' })
     }
     type = rawType as TransactionType
   }
-  const transactions = await getTransactions(userId, { type })
+
+  const categoryId = Array.isArray(req.query.categoryId)
+    ? req.query.categoryId[0]
+    : req.query.categoryId
+
+  if (categoryId !== undefined) {
+    if (typeof categoryId !== 'string' || categoryId.trim() === '') {
+      return res.status(400).json({ error: 'Invalid categoryId' })
+    }
+  }
+
+  const transactions = await getTransactions(userId, { type, categoryId })
 
   return res.status(200).json({ transactions })
 })
