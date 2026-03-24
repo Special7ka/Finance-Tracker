@@ -99,7 +99,7 @@ describe('Transactions', () => {
     const createdIncomeTx = await createAndGetTransaction(token, {
       type: 'INCOME',
     })
-    const createdExpenseTx = await createAndGetTransaction(token, {
+    const createdIncomeTx2 = await createAndGetTransaction(token, {
       type: 'EXPENSE',
     })
 
@@ -117,6 +117,28 @@ describe('Transactions', () => {
     expect(tx).toBeDefined()
     expect(tx.type).toBe('INCOME')
     expect(tx.amount).toBe(createdIncomeTx.amount)
+  })
+  it('GET /transactions with categoryId filter returns 200 and filtered transactions', async () => {
+    const token = await registerAndGetToken()
+
+    const createdIncomeTx = await createAndGetTransaction(token)
+
+    await createAndGetTransaction(token, {
+      categoryId: 'some-other-category-id',
+    })
+
+    const res = await request(app)
+      .get('/transactions?categoryId=' + createdIncomeTx.categoryId)
+      .set('Authorization', 'Bearer ' + token)
+
+    expect(res.status).toBe(200)
+    expect(res.body.transactions).toHaveLength(1)
+
+    expect(res.body.transactions[0]).toMatchObject({
+      id: createdIncomeTx.id,
+      categoryId: createdIncomeTx.categoryId,
+      amount: createdIncomeTx.amount,
+    })
   })
   it('GET /transactions without INCOME transactions returns empty massive', async () => {
     const token = await registerAndGetToken()
