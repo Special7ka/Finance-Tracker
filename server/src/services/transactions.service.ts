@@ -37,15 +37,30 @@ export async function createTransaction(
 
 export async function getTransactions(
   userId: string,
-  query: { type?: TransactionType; categoryId?: string },
+  query: {
+    type?: TransactionType
+    categoryId?: string
+    from?: Date
+    to?: Date
+  },
 ) {
   const prisma = getPrisma()
-  let where: { userId: string; type?: TransactionType; categoryId?: string } = {
+  let where: {
+    userId: string
+    type?: TransactionType
+    categoryId?: string
+    from?: Date
+    to?: Date
+  } = {
     userId: userId,
   }
 
-  if (query.type) {
+  if (query.type !== undefined) {
     where.type = query.type
+  }
+
+  if (query.categoryId !== undefined) {
+    where.categoryId = query.categoryId
   }
 
   if (query.categoryId !== undefined) {

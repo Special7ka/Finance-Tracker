@@ -64,6 +64,7 @@ router.get('/', authorization, verifyJWT, async (req, res) => {
     ? req.query.type[0]
     : req.query.type
   let type: TransactionType | undefined
+
   if (rawType !== undefined) {
     if (rawType !== 'INCOME' && rawType !== 'EXPENSE') {
       return res.status(400).json({ error: 'Invalid type' })
@@ -81,7 +82,40 @@ router.get('/', authorization, verifyJWT, async (req, res) => {
     }
   }
 
-  const transactions = await getTransactions(userId, { type, categoryId })
+  const rawFrom = Array.isArray(req.query.from)
+    ? req.query.from[0]
+    : req.query.from
+  let from: Date | undefined
+
+  if (rawFrom !== undefined) {
+    if (typeof rawFrom !== 'string' || rawFrom.trim() === '') {
+      return res.status(400).json({ error: 'Invalid from' })
+    }
+    from = new Date(rawFrom)
+    if (Number.isNaN(from.getTime())) {
+      return res.status(400).json({ error: 'Invalid from' })
+    }
+  }
+
+  const rawTo = Array.isArray(req.query.to) ? req.query.to[0] : req.query.to
+  let to: Date | undefined
+
+  if (rawTo !== undefined) {
+    if (typeof rawTo !== 'string' || rawTo.trim() === '') {
+      return res.status(400).json({ error: 'Invalid to' })
+    }
+    to = new Date(rawTo)
+    if (Number.isNaN(to.getTime())) {
+      return res.status(400).json({ error: 'Invalid from' })
+    }
+  }
+
+  const transactions = await getTransactions(userId, {
+    type,
+    categoryId,
+    from,
+    to,
+  })
 
   return res.status(200).json({ transactions })
 })
