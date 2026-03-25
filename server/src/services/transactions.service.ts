@@ -49,22 +49,29 @@ export async function getTransactions(
     userId: string
     type?: TransactionType
     categoryId?: string
-    from?: Date
-    to?: Date
+    occurredAt?: {
+      gte?: Date
+      lte?: Date
+    }
   } = {
     userId: userId,
+  }
+
+  const dateFilter: { gte?: Date; lte?: Date } = {}
+
+  if (query.from !== undefined) {
+    dateFilter.gte = query.from
+  }
+  if (query.to !== undefined) {
+    dateFilter.lte = query.to
   }
 
   if (query.type !== undefined) {
     where.type = query.type
   }
 
-  if (query.categoryId !== undefined) {
-    where.categoryId = query.categoryId
-  }
-
-  if (query.categoryId !== undefined) {
-    where.categoryId = query.categoryId
+  if (query.from !== undefined || query.from !== undefined) {
+    where.occurredAt = dateFilter
   }
 
   const transactions = await prisma.transaction.findMany({
