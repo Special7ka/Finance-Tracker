@@ -166,6 +166,76 @@ describe('Transactions', () => {
       res.body.transactions.find((t: any) => t.id === tx1.id),
     ).toBeUndefined()
   })
+  it('GET /transactions with date range filter returns 200 and filtered transaction', async () => {
+    const token = await registerAndGetToken()
+
+    const date1 = '2024-01-01T00:00:00.000Z'
+    const date2 = '2024-01-15T00:00:00.000Z'
+    const date3 = '2024-02-01T00:00:00.000Z'
+
+    await createAndGetTransaction(token, { occurredAt: date1, amount: 10 })
+    const tx2 = await createAndGetTransaction(token, {
+      occurredAt: date2,
+      amount: 20,
+    })
+    await createAndGetTransaction(token, { occurredAt: date3, amount: 30 })
+
+    const res = await request(app)
+      .get('/transactions?from=2024-01-15&to=2024-01-20')
+      .set('Authorization', 'Bearer ' + token)
+
+    expect(res.status).toBe(200)
+    expect(res.body.transactions.length).toBe(1)
+    expect(res.body.transactions[0].id).toEqual(tx2.id)
+  })
+  it('GET /transactions with  range from filter returns 200 and filtered transaction', async () => {
+    const token = await registerAndGetToken()
+
+    const date1 = '2024-01-01T00:00:00.000Z'
+    const date2 = '2024-01-15T00:00:00.000Z'
+    const date3 = '2024-02-01T00:00:00.000Z'
+
+    await createAndGetTransaction(token, { occurredAt: date1, amount: 10 })
+    await createAndGetTransaction(token, { occurredAt: date2, amount: 40 })
+
+    const tx3 = await createAndGetTransaction(token, {
+      occurredAt: date3,
+      amount: 30,
+    })
+
+    const res = await request(app)
+      .get('/transactions?from=2024-01-16')
+      .set('Authorization', 'Bearer ' + token)
+
+    expect(res.status).toBe(200)
+    expect(res.body.transactions.length).toBe(1)
+    expect(res.body.transactions[0].id).toEqual(tx3.id)
+  })
+  it('GET /transactions with date range to filter returns 200 and filtered transaction', async () => {
+    const token = await registerAndGetToken()
+
+    const date1 = '2024-01-01T00:00:00.000Z'
+    const date2 = '2024-01-15T00:00:00.000Z'
+    const date3 = '2024-02-01T00:00:00.000Z'
+
+    const tx1 = await createAndGetTransaction(token, {
+      occurredAt: date1,
+      amount: 10,
+    })
+    await createAndGetTransaction(token, {
+      occurredAt: date2,
+      amount: 20,
+    })
+    await createAndGetTransaction(token, { occurredAt: date3, amount: 30 })
+
+    const res = await request(app)
+      .get('/transactions?to=2024-01-14')
+      .set('Authorization', 'Bearer ' + token)
+
+    expect(res.status).toBe(200)
+    expect(res.body.transactions.length).toBe(1)
+    expect(res.body.transactions[0].id).toEqual(tx1.id)
+  })
   it('PATCH /transactions/:id return 200 and updated transactions', async () => {
     const token = await registerAndGetToken()
     const createdTx = await createAndGetTransaction(token)
