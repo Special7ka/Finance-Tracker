@@ -7,41 +7,25 @@ import {
   updateTransaction,
   deleteTransaction,
 } from '../services/transactions.service'
-import { json } from 'node:stream/consumers'
 import { TransactionType } from '@prisma/client'
+import {
+  validateCreateTransaction,
+  validateUpdateTransaction,
+} from '../utils/transactionValidation'
 
 const router = Router()
 
 router.post('/', authorization, verifyJWT, async (req, res) => {
   const userId = (req as any).userId
-  const { amount, type, occurredAt, categoryId } = req.body
-  const occurredDate = new Date(occurredAt)
-
-  if (!amount || typeof amount !== 'number' || amount <= 0) {
-    return res.status(400).json({ error: 'invalid amount' })
-  }
-  if (
-    !type ||
-    typeof type !== 'string' ||
-    (type !== 'INCOME' && type !== 'EXPENSE') ||
-    type.trim() === ''
-  ) {
-    return res.status(400).json({ error: 'invalid type' })
-  }
-  if (Number.isNaN(occurredDate.getTime())) {
-    return res.status(400).json({ error: 'invalid occurredAt' })
-  }
-  if (categoryId) {
-    if (typeof categoryId !== 'string' || categoryId.trim() === '') {
-      return res.status(400).json({ error: 'invalid category id' })
-    }
-  }
 
   try {
+    const { amount, type, occurredAt, categoryId } = validateCreateTransaction(
+      req.body,
+    )
     const transaction = await createTransaction(
       userId,
       type,
-      occurredDate,
+      occurredAt,
       amount,
       categoryId,
     )
@@ -51,9 +35,17 @@ router.post('/', authorization, verifyJWT, async (req, res) => {
       if (e.message === 'Category not found') {
         return res.status(404).json({ error: e.message })
       }
-      return res.status(500).json({ error: 'Internal server error' })
+      if (
+        e.message === 'invalid amount' ||
+        e.message === 'invalid body' ||
+        e.message === 'invalid type' ||
+        e.message === 'invalid occurredAt' ||
+        e.message === 'invalid categoryId'
+      ) {
+        return res.status(400).json({ error: e.message })
+      }
     }
-    return
+    return res.status(500).json({ error: 'Internal server error' })
   }
 })
 
@@ -122,60 +114,32 @@ router.get('/', authorization, verifyJWT, async (req, res) => {
 
 router.patch('/:id', authorization, verifyJWT, async (req, res) => {
   const userId = (req as any).userId
-  const { amount, type, occurredAt, categoryId } = req.body
   const transactionId = Array.isArray(req.params.id)
     ? req.params.id[0]
     : req.params.id
 
-  const data: any = {}
-
-  if (amount !== undefined) {
-    if (amount < 1) {
-      res.status(400).json({ error: 'invalid amount' })
-      return
-    }
-    data.amount = amount
-  }
-  if (type !== undefined) {
-    if (type !== 'INCOME' && type !== 'EXPENSE') {
-      res.status(400).json({ error: 'invalid type' })
-      return
-    }
-    data.type = type
-  }
-  if (occurredAt !== undefined) {
-    const occurredDate = new Date(occurredAt)
-    if (Number.isNaN(occurredDate.getTime())) {
-      res.status(400).json({ error: 'invalid occurredAt' })
-      return
-    }
-    data.occurredAt = occurredDate
-  }
-  if (categoryId !== undefined) {
-    if (categoryId === '') {
-      res.status(400).json({ error: 'invalid categoryId' })
-      return
-    }
-    data.categoryId = categoryId
-  }
-
-  if (Object.keys(data).length === 0) {
-    res.status(400).json({ error: 'invalid data' })
-    return
-  }
-
   try {
+    const data = validateUpdateTransaction(req.body)
     const transaction = await updateTransaction(userId, transactionId, data)
     return res.status(200).json({ transaction })
   } catch (e) {
     if (e instanceof Error) {
-      if (e.message === 'Transaction not found') {
-        res.status(404).json({ error: 'Transaction not found' })
+      if (
+        e.message === 'Transaction not found' ||
+        e.message === 'Category not found'
+      ) {
+        res.status(404).json({ error: e.message })
         return
       }
-      if (e.message === 'Category not found') {
-        res.status(404).json({ error: 'Category not found' })
-        return
+      if (
+        e.message === 'invalid amount' ||
+        e.message === 'invalid body' ||
+        e.message === 'invalid type' ||
+        e.message === 'invalid occurredAt' ||
+        e.message === 'invalid categoryId' ||
+        e.message === 'invalid data'
+      ) {
+        return res.status(400).json({ error: e.message })
       }
     }
     return res.status(500).json({ error: 'Internal server error' })

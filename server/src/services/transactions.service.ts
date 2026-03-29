@@ -70,7 +70,7 @@ export async function getTransactions(
     where.type = query.type
   }
 
-  if (query.from !== undefined || query.from !== undefined) {
+  if (query.from !== undefined || query.to !== undefined) {
     where.occurredAt = dateFilter
   }
 
