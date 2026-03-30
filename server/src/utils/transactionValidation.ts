@@ -14,6 +14,17 @@ interface UpdateTransactionValidated {
   categoryId?: string
 }
 
+interface GetTransactionValidated {
+  type?: TransactionType
+  categoryId?: string
+  from?: Date
+  to?: Date
+}
+
+const getFirstQueryValue = (value: unknown) => {
+  return Array.isArray(value) ? value[0] : value
+}
+
 export function validateCreateTransaction(
   body: unknown,
 ): CreateTransactionValidated {
@@ -116,6 +127,72 @@ export function validateUpdateTransaction(
 
   if (Object.keys(data).length === 0) {
     throw new Error('invalid data')
+  }
+
+  return data
+}
+
+export function validateGetTransaction(
+  query: unknown,
+): GetTransactionValidated {
+  const data: GetTransactionValidated = {}
+
+  if (typeof query !== 'object' || query === null) {
+    throw new Error('invalid query')
+  }
+
+  const q = query as {
+    type?: unknown
+    categoryId?: unknown
+    from?: unknown
+    to?: unknown
+  }
+
+  const type = getFirstQueryValue(q.type)
+  const categoryId = getFirstQueryValue(q.categoryId)
+  const from = getFirstQueryValue(q.from)
+  const to = getFirstQueryValue(q.to)
+
+  if (type !== undefined) {
+    if (typeof type !== 'string' || (type !== 'INCOME' && type !== 'EXPENSE')) {
+      throw new Error('invalid type')
+    }
+    data.type = type
+  }
+
+  if (categoryId !== undefined) {
+    if (typeof categoryId !== 'string' || categoryId.trim() === '') {
+      throw new Error('invalid categoryId')
+    }
+    data.categoryId = categoryId
+  }
+
+  if (from !== undefined) {
+    if (typeof from !== 'string' || from.trim() === '') {
+      throw new Error('invalid from')
+    }
+
+    const fromDate = new Date(from)
+
+    if (Number.isNaN(fromDate.getTime())) {
+      throw new Error('invalid from')
+    }
+
+    data.from = fromDate
+  }
+
+  if (to !== undefined) {
+    if (typeof to !== 'string' || to.trim() === '') {
+      throw new Error('invalid to')
+    }
+
+    const toDate = new Date(to)
+
+    if (Number.isNaN(toDate.getTime())) {
+      throw new Error('invalid to')
+    }
+
+    data.to = toDate
   }
 
   return data

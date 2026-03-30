@@ -11,6 +11,7 @@ import { TransactionType } from '@prisma/client'
 import {
   validateCreateTransaction,
   validateUpdateTransaction,
+  validateGetTransaction,
 } from '../utils/transactionValidation'
 
 const router = Router()
@@ -52,71 +53,29 @@ router.post('/', authorization, verifyJWT, async (req, res) => {
 router.get('/', authorization, verifyJWT, async (req, res) => {
   const userId = (req as any).userId
 
-  const rawType = Array.isArray(req.query.type)
-    ? req.query.type[0]
-    : req.query.type
-  let type: TransactionType | undefined
-
-  if (rawType !== undefined) {
-    if (rawType !== 'INCOME' && rawType !== 'EXPENSE') {
-      return res.status(400).json({ error: 'Invalid type' })
+  try {
+    const filters = validateGetTransaction(req.query)
+    const transactions = await getTransactions(userId, filters)
+    return res.status(200).json({ transactions })
+  } catch (e) {
+    if (e instanceof Error) {
+      if (
+        e.message === 'invalid type' ||
+        e.message === 'invalid categoryId' ||
+        e.message === 'invalid from' ||
+        e.message === 'invalid to' ||
+        e.message === 'invalid query'
+      ) {
+        return res.status(400).json({ error: e.message })
+      }
     }
-    type = rawType as TransactionType
+    return res.status(500).json({ error: 'Internal server error' })
   }
-
-  const categoryId = Array.isArray(req.query.categoryId)
-    ? req.query.categoryId[0]
-    : req.query.categoryId
-
-  if (categoryId !== undefined) {
-    if (typeof categoryId !== 'string' || categoryId.trim() === '') {
-      return res.status(400).json({ error: 'Invalid categoryId' })
-    }
-  }
-
-  const rawFrom = Array.isArray(req.query.from)
-    ? req.query.from[0]
-    : req.query.from
-  let from: Date | undefined
-
-  if (rawFrom !== undefined) {
-    if (typeof rawFrom !== 'string' || rawFrom.trim() === '') {
-      return res.status(400).json({ error: 'Invalid from' })
-    }
-    from = new Date(rawFrom)
-    if (Number.isNaN(from.getTime())) {
-      return res.status(400).json({ error: 'Invalid from' })
-    }
-  }
-
-  const rawTo = Array.isArray(req.query.to) ? req.query.to[0] : req.query.to
-  let to: Date | undefined
-
-  if (rawTo !== undefined) {
-    if (typeof rawTo !== 'string' || rawTo.trim() === '') {
-      return res.status(400).json({ error: 'Invalid to' })
-    }
-    to = new Date(rawTo)
-    if (Number.isNaN(to.getTime())) {
-      return res.status(400).json({ error: 'Invalid from' })
-    }
-  }
-
-  const transactions = await getTransactions(userId, {
-    type,
-    categoryId,
-    from,
-    to,
-  })
-
-  return res.status(200).json({ transactions })
 })
 
 router.patch('/:id', authorization, verifyJWT, async (req, res) => {
   const userId = (req as any).userId
-  const transactionId = Array.isArray(req.params.id)
-    ? req.params.id[0]
-    : req.params.id
+  const { id: transactionId } = req.params as { id: string }
 
   try {
     const data = validateUpdateTransaction(req.body)
