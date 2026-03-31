@@ -90,7 +90,7 @@ describe('Transactions', () => {
       .set('Authorization', 'Bearer ' + token)
 
     expect(res.status).toBe(400)
-    expect(res.body.error).toEqual('Invalid type')
+    expect(res.body.error).toEqual('invalid type')
   })
 
   it('GET /transactions with type filter returns 200 and filtered transactions', async () => {
