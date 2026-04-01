@@ -17,6 +17,14 @@ import { Request, Response, NextFunction } from 'express'
   "Transaction not found",
  ]
 
+ const conflictErrors = [
+  "User already exists"
+ ]
+
+ const unauthorizedErrors = [
+  "Invalid credentials"
+ ]
+
 export const errorHandler = (
   err: unknown,
   req: Request,
@@ -36,6 +44,14 @@ export const errorHandler = (
 
   if(badRequestErrors.includes(err.message)){
     return res.status(400).json({error: err.message})
+  }
+
+  if(conflictErrors.includes(err.message)){
+    return res.status(409).json({error: err.message})
+  }
+
+   if(unauthorizedErrors.includes(err.message)){
+    return res.status(401).json({error: err.message})
   }
 
  }

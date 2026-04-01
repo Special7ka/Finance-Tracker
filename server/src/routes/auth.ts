@@ -27,17 +27,10 @@ router.post('/register', async (req, res, next) => {
 
   try {
     const token = await register(email, password)
-
-    res.status(201).json({ token })
-    return
+    
+    return res.status(201).json({ token })
   } catch (e) {
-    if (e instanceof Error) {
-      if (e.message === 'User already exists') {
-        res.status(409).json({ error: e.message })
-        return
-      }
-      return next(e)
-    }
+    return next(e)
   }
 })
 
@@ -50,22 +43,15 @@ router.post('/login', async (req, res, next) => {
     email.trim() === '' ||
     password.trim() === ''
   ) {
-    res.status(400).json({ error: 'Invalid login or password' })
-    return
+    return res.status(400).json({ error: 'Invalid login or password' })
   }
 
   try {
     const token = await login(email, password)
-    res.status(200).json({ token })
-    return
+    
+    return res.status(200).json({ token })
   } catch (e) {
-    if (e instanceof Error) {
-      if (e.message === 'Invalid credentials') {
-        res.status(401).json({ error: 'Invalid credentials' })
-        return
-      }
-      return next(e)
-    }
+    return next(e)
   }
 })
 

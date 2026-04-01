@@ -15,6 +15,7 @@ describe('Auth smoke', () => {
     expect(typeof res.body.token).toBe('string')
     expect(res.body.token.length).toBeGreaterThan(0)
   })
+
   it('Login smoke', async () => {
     const email = 'test@test'
     const password = 'testtest'
@@ -27,6 +28,7 @@ describe('Auth smoke', () => {
     expect(typeof res.body.token).toBe('string')
     expect(res.body.token.length).toBeGreaterThan(0)
   })
+
   it('/me smoke', async () => {
     const email = 'test@test'
     const password = 'testtest'
@@ -46,20 +48,24 @@ describe('Auth smoke', () => {
     expect(res.body.id.length).toBeGreaterThan(0)
     expect(typeof res.body.id).toBe('string')
   })
+
   it('login validation returns 400 ', async () => {
     const res = await request(app).post('/auth/login').send({})
     expect(res.status).toBe(400)
   })
+
   it('/me without autorization returns 401', async () => {
     const res = await request(app).get('/me')
     expect(res.status).toBe(401)
   })
+
   it('/me with invalid token returns 401', async () => {
     const res = await request(app)
       .get('/me')
       .set('Authorization', 'Bearer invalid_token')
     expect(res.status).toBe(401)
   })
+
   it('login wrong password returns 401', async () => {
     const email = 'test@test'
     let password = 'testtest'
@@ -72,6 +78,7 @@ describe('Auth smoke', () => {
 
     expect(res.status).toBe(401)
   })
+
   it('login unknown email returns 401', async () => {
     const email = 'test@test'
     const password = 'testtest'
@@ -80,6 +87,7 @@ describe('Auth smoke', () => {
 
     expect(res.status).toBe(401)
   })
+
   it('register duplicate email returns 409', async () => {
     const email = 'test@test'
     const password = 'testtest'
@@ -92,16 +100,19 @@ describe('Auth smoke', () => {
 
     expect(res.status).toBe(409)
   })
+  
   it('bad register validation returns 400', async () => {
     const res = await request(app).post('/auth/register').send({})
 
     expect(res.status).toBe(400)
   })
+
   it('bad login validation returns 400', async () => {
     const res = await request(app).post('/auth/login').send({})
 
     expect(res.status).toBe(400)
   })
+  
   it('passwordHash in db is not the same as register password ', async () => {
     const email = 'test@test'
     const password = 'testtest'
