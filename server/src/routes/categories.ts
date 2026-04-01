@@ -10,13 +10,12 @@ import {
 
 const router = Router()
 
-router.post('/', authorization, verifyJWT, async (req, res) => {
+router.post('/', authorization, verifyJWT, async (req, res, next) => {
   const userId = (req as any).userId
   const name = req.body.name
 
   if (!name || typeof name !== 'string' || name.trim() === '') {
-    res.status(400).json({ error: 'invalid name' })
-    return
+    return res.status(400).json({ error: 'invalid name' })
   }
   try {
     const newCategory = await createCategory(userId, name)
@@ -24,20 +23,22 @@ router.post('/', authorization, verifyJWT, async (req, res) => {
       .status(201)
       .json({ message: 'successfully created', category: newCategory })
   } catch (e) {
-    if (e instanceof Error) {
-      res.status(500).json({ error: e.message })
-      return
-    }
+    return next(e)
   }
 })
 
-router.get('/', authorization, verifyJWT, async (req, res) => {
+router.get('/', authorization, verifyJWT, async (req, res,next) => {
   const userId = (req as any).userId
-  const categories = await getCategoriesByUserId(userId)
-  res.json(categories)
+  try{
+    const categories = await getCategoriesByUserId(userId)
+    return res.json(categories)
+  }catch(e){
+    return next(e)
+  }
+
 })
 
-router.patch('/:id', authorization, verifyJWT, async (req, res) => {
+router.patch('/:id', authorization, verifyJWT, async (req, res, next) => {
   const userId = (req as any).userId
   const categoryID = Array.isArray(req.params.id)
     ? req.params.id[0]
@@ -54,16 +55,11 @@ router.patch('/:id', authorization, verifyJWT, async (req, res) => {
       .status(200)
       .json({ message: 'successfully updated', category: newCategory })
   } catch (e) {
-    if (e instanceof Error) {
-      if (e.message === 'Category not found') {
-        return res.status(404).json({ error: 'Category not found' })
-      }
-
-      return res.status(500).json({ error: 'Internal server error' })
+     return next(e)
     }
-  }
-})
-router.delete('/:id', authorization, verifyJWT, async (req, res) => {
+  })
+
+router.delete('/:id', authorization, verifyJWT, async (req, res, next) => {
   const userId = (req as any).userId
   const categoryID = Array.isArray(req.params.id)
     ? req.params.id[0]
@@ -73,10 +69,7 @@ router.delete('/:id', authorization, verifyJWT, async (req, res) => {
     await deleteCategory(userId, categoryID)
     return res.status(204).send()
   } catch (e) {
-    if (e instanceof Error) {
-      res.status(404).json({ error: 'Category not found' })
-      return
-    }
+    return next(e)
   }
 })
 export default router
