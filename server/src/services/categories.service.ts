@@ -1,4 +1,5 @@
 import { getPrisma } from '../db/prisma'
+import { NotFoundError } from '../errors'
 
 export async function getCategoriesByUserId(userId: string) {
   const prisma = getPrisma()
@@ -20,7 +21,7 @@ export async function updateCategory(
     where: { id: categoryID, userId: userId },
   })
   if (!userCategory) {
-    throw new Error('Category not found')
+    throw new NotFoundError('Category not found')
   }
   if (userCategory?.name === newName) {
     return userCategory
@@ -34,7 +35,7 @@ export async function updateCategory(
     },
   })
   if (exists) {
-    throw new Error('Category already exist')
+    throw new NotFoundError('Category already exist')
   }
 
   const newCategory = await prisma.category.update({
@@ -75,6 +76,6 @@ export async function deleteCategory(userId: string, categoryID: string) {
     })
     return
   } else {
-    throw new Error('Category not found')
+    throw new NotFoundError('Category not found')
   }
 }

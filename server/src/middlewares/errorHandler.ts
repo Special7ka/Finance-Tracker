@@ -1,29 +1,6 @@
+import { error } from 'console'
 import { Request, Response, NextFunction } from 'express'
-
- const badRequestErrors = [
-  "invalid amount",
-  "invalid type",
-  "invalid occurredAt",
-  "invalid body",
-  "invalid query",
-  "invalid categoryId",
-  "invalid data",
-  "invalid from",
-  "invalid to"
- ]
-
- const notFoundErrors = [
-  "Category not found",
-  "Transaction not found",
- ]
-
- const conflictErrors = [
-  "User already exists"
- ]
-
- const unauthorizedErrors = [
-  "Invalid credentials"
- ]
+import { AppError } from '../errors/AppError'
 
 export const errorHandler = (
   err: unknown,
@@ -31,31 +8,9 @@ export const errorHandler = (
   res: Response,
   next: NextFunction,
 ) => {
+  if (err instanceof AppError) {
+    return res.status(err.status).json({ error: err.message })
+  }
 
- if(err instanceof Error){
-  if (err instanceof Error) {
-  console.error(err.stack)
-} else {
-  console.error(err)
+  return res.status(500).json({ error: 'Internal server error' })
 }
-    if(notFoundErrors.includes(err.message)){
-    return res.status(404).json({error: err.message})
-  }
-
-  if(badRequestErrors.includes(err.message)){
-    return res.status(400).json({error: err.message})
-  }
-
-  if(conflictErrors.includes(err.message)){
-    return res.status(409).json({error: err.message})
-  }
-
-   if(unauthorizedErrors.includes(err.message)){
-    return res.status(401).json({error: err.message})
-  }
-
- }
-
- return res.status(500).json({error: "Internal server error"})
-}
-

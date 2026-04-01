@@ -90,7 +90,7 @@ describe('Transactions', () => {
       .set('Authorization', 'Bearer ' + token)
 
     expect(res.status).toBe(400)
-    expect(res.body.error).toEqual('invalid type')
+    expect(res.body.error).toEqual('Invalid type')
   })
 
   it('GET /transactions with type filter returns 200 and filtered transactions', async () => {
@@ -275,7 +275,7 @@ describe('Transactions', () => {
       .send(newBody)
 
     expect(res.status).toBe(400)
-    expect(res.body).toEqual({ error: 'invalid data' })
+    expect(res.body).toEqual({ error: 'Invalid data' })
   })
   it('PATCH /transactions/:id with invalid data returns 400', async () => {
     const token = await registerAndGetToken()
@@ -290,7 +290,7 @@ describe('Transactions', () => {
       .send(newBody)
 
     expect(res.status).toBe(400)
-    expect(res.body).toEqual({ error: 'invalid amount' })
+    expect(res.body).toEqual({ error: 'Invalid amount' })
   })
   it('PATCH /transactions/:id without valid token returns 401', async () => {
     const token = await registerAndGetToken()

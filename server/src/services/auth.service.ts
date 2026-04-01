@@ -2,6 +2,7 @@ import { getPrisma } from '../db/prisma'
 import bcrypt from 'bcrypt'
 import jsonwebtoken from 'jsonwebtoken'
 import { DEFAULT_CATEGORIES } from '../constants/defaultCategories'
+import { UnauthorizedError, ConflictError } from '../errors'
 
 export async function register(
   email: string,
@@ -13,7 +14,7 @@ export async function register(
   const cryptPass = await bcrypt.hash(password, 10)
 
   if (user) {
-    throw new Error('User already exists')
+    throw new ConflictError('User already exists')
   }
 
   const newUser = await prisma.user.create({
@@ -24,7 +25,7 @@ export async function register(
   })
 
   if (process.env.JWT_SECRET === undefined) {
-    throw new Error('JWT undefined')
+    throw new UnauthorizedError('JWT undefined')
   }
 
   for (let i = 0; i < DEFAULT_CATEGORIES.length; i++) {
@@ -48,17 +49,17 @@ export async function login(email: string, password: string): Promise<string> {
   const user = await prisma.user.findUnique({ where: { email } })
 
   if (!user) {
-    throw new Error('Invalid credentials')
+    throw new UnauthorizedError('Invalid credentials')
   }
 
   const verif = await bcrypt.compare(password, user.passwordHash)
 
   if (!verif) {
-    throw new Error('Invalid credentials')
+    throw new UnauthorizedError('Invalid credentials')
   }
 
   if (process.env.JWT_SECRET === undefined) {
-    throw new Error('JWT undefined')
+    throw new UnauthorizedError('JWT undefined')
   }
   const secret = process.env.JWT_SECRET
   const token = jsonwebtoken.sign({ userId: user.id }, secret, {

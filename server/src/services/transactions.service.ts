@@ -1,5 +1,6 @@
 import { getPrisma } from '../db/prisma'
 import { TransactionType } from '@prisma/client'
+import { NotFoundError } from '../errors'
 
 export async function createTransaction(
   userId: string,
@@ -103,12 +104,12 @@ export async function updateTransaction(
       },
     })
     if (category?.userId !== userId) {
-      throw new Error('Category not found')
+      throw new NotFoundError('Category not found')
     }
   }
 
   if (!transaction || transaction.userId !== userId) {
-    throw new Error('Transaction not found')
+    throw new NotFoundError('Transaction not found')
   }
 
   const newTransaction = await prisma.transaction.update({
@@ -139,6 +140,6 @@ export async function deleteTransaction(userId: string, transactionId: string) {
     })
     return
   } else {
-    throw new Error('Transaction not found')
+    throw new NotFoundError('Transaction not found')
   }
 }
