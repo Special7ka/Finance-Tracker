@@ -1,6 +1,19 @@
 import { getPrisma } from '../db/prisma'
 import { NotFoundError } from '../errors'
 
+export async function createCategory(userId: string, name: string) {
+  const prisma = getPrisma()
+
+  const newCategory = await prisma.category.create({
+    data: {
+      userId: userId,
+      name: name,
+    },
+  })
+
+  return newCategory
+}
+
 export async function getCategoriesByUserId(userId: string) {
   const prisma = getPrisma()
   const userCategories = await prisma.category.findMany({
@@ -41,19 +54,6 @@ export async function updateCategory(
   const newCategory = await prisma.category.update({
     where: { id: categoryID },
     data: { name: newName },
-  })
-
-  return newCategory
-}
-
-export async function createCategory(userId: string, name: string) {
-  const prisma = getPrisma()
-
-  const newCategory = await prisma.category.create({
-    data: {
-      userId: userId,
-      name: name,
-    },
   })
 
   return newCategory

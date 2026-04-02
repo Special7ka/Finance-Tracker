@@ -73,66 +73,6 @@ export function validateCreateTransaction(
   }
 }
 
-export function validateUpdateTransaction(
-  body: unknown,
-): UpdateTransactionValidated {
-  if (typeof body !== 'object' || body === null) {
-    throw new BadRequestError('Invalid body')
-  }
-
-  const rawData = body as {
-    amount?: unknown
-    type?: unknown
-    occurredAt?: unknown
-    categoryId?: unknown
-  }
-
-  const { amount, type, occurredAt, categoryId } = rawData
-
-  const data = {} as UpdateTransactionValidated
-
-  if (amount !== undefined) {
-    if (typeof amount !== 'number' || amount <= 0) {
-      throw new BadRequestError('Invalid amount')
-    }
-    data.amount = amount
-  }
-
-  if (type !== undefined) {
-    if (typeof type !== 'string' || (type !== 'INCOME' && type !== 'EXPENSE')) {
-      throw new BadRequestError('Invalid type')
-    }
-    data.type = type
-  }
-
-  if (occurredAt !== undefined) {
-    if (typeof occurredAt !== 'string' || occurredAt.trim() === '') {
-      throw new BadRequestError('Invalid occurredAt')
-    }
-
-    const occurredDate = new Date(occurredAt)
-
-    if (Number.isNaN(occurredDate.getTime())) {
-      throw new BadRequestError('Invalid occurredAt')
-    }
-
-    data.occurredAt = occurredDate
-  }
-
-  if (categoryId !== undefined) {
-    if (typeof categoryId !== 'string' || categoryId.trim() === '') {
-      throw new BadRequestError('Invalid categoryId')
-    }
-    data.categoryId = categoryId
-  }
-
-  if (Object.keys(data).length === 0) {
-    throw new BadRequestError('Invalid data')
-  }
-
-  return data
-}
-
 export function validateGetTransaction(
   query: unknown,
 ): GetTransactionValidated {
@@ -194,6 +134,66 @@ export function validateGetTransaction(
     }
 
     data.to = toDate
+  }
+
+  return data
+}
+
+export function validateUpdateTransaction(
+  body: unknown,
+): UpdateTransactionValidated {
+  if (typeof body !== 'object' || body === null) {
+    throw new BadRequestError('Invalid body')
+  }
+
+  const rawData = body as {
+    amount?: unknown
+    type?: unknown
+    occurredAt?: unknown
+    categoryId?: unknown
+  }
+
+  const { amount, type, occurredAt, categoryId } = rawData
+
+  const data = {} as UpdateTransactionValidated
+
+  if (amount !== undefined) {
+    if (typeof amount !== 'number' || amount <= 0) {
+      throw new BadRequestError('Invalid amount')
+    }
+    data.amount = amount
+  }
+
+  if (type !== undefined) {
+    if (typeof type !== 'string' || (type !== 'INCOME' && type !== 'EXPENSE')) {
+      throw new BadRequestError('Invalid type')
+    }
+    data.type = type
+  }
+
+  if (occurredAt !== undefined) {
+    if (typeof occurredAt !== 'string' || occurredAt.trim() === '') {
+      throw new BadRequestError('Invalid occurredAt')
+    }
+
+    const occurredDate = new Date(occurredAt)
+
+    if (Number.isNaN(occurredDate.getTime())) {
+      throw new BadRequestError('Invalid occurredAt')
+    }
+
+    data.occurredAt = occurredDate
+  }
+
+  if (categoryId !== undefined) {
+    if (typeof categoryId !== 'string' || categoryId.trim() === '') {
+      throw new BadRequestError('Invalid categoryId')
+    }
+    data.categoryId = categoryId
+  }
+
+  if (Object.keys(data).length === 0) {
+    throw new BadRequestError('Invalid data')
   }
 
   return data

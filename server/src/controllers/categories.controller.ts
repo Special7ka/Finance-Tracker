@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import {
+  createCategory,
   getCategoriesByUserId,
   updateCategory,
-  createCategory,
   deleteCategory,
 } from '../services/categories.service'
 
