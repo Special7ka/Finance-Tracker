@@ -1,6 +1,6 @@
 import { error } from 'console'
 import { Request, Response, NextFunction } from 'express'
-import { AppError } from '../errors/AppError'
+import { AppError } from '../errors/appError'
 
 export const errorHandler = (
   err: unknown,

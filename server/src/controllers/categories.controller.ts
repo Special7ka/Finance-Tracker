@@ -48,9 +48,7 @@ export const updateCategoriesController = async (
   next: NextFunction,
 ) => {
   const userId = (req as any).userId
-  const categoryID = Array.isArray(req.params.id)
-    ? req.params.id[0]
-    : req.params.id
+  const { id: categoryID } = req.params as { id: string }
   const name = req.body.name
 
   if (!name || typeof name !== 'string' || name.trim() === '') {
@@ -73,9 +71,7 @@ export const deleteCategoryController = async (
   next: NextFunction,
 ) => {
   const userId = (req as any).userId
-  const categoryID = Array.isArray(req.params.id)
-    ? req.params.id[0]
-    : req.params.id
+  const { id: categoryID } = req.params as { id: string }
 
   try {
     await deleteCategory(userId, categoryID)

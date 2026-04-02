@@ -9,7 +9,7 @@ import {
   validateCreateTransaction,
   validateGetTransaction,
   validateUpdateTransaction,
-} from '../utils/transactionValidation'
+} from '../utils/transaction.validator'
 
 export const createTransactionController = async (
   req: Request,
@@ -73,9 +73,7 @@ export const deleteTransactionController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const transactionId = Array.isArray(req.params.id)
-    ? req.params.id[0]
-    : req.params.id
+  const { id: transactionId } = req.params as { id: string }
   const userId = (req as any).userId
 
   try {
