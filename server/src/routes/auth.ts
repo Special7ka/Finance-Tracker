@@ -1,31 +1,12 @@
 import { Router } from 'express'
 import { register, login } from '../services/auth.service'
+import { validateRegistrationBody,validateLoginBody } from '../utils/authValidation'
 
 const router = Router()
 
 router.post('/register', async (req, res, next) => {
-  const { email, password } = req.body
-
-  if (
-    typeof email !== 'string' ||
-    email.trim() === '' ||
-    !email.includes('@')
-  ) {
-    res.status(400).json({ error: 'Invalid email' })
-    return
-  }
-
-  if (typeof password !== 'string') {
-    res.status(400).json({ error: 'Invalid password' })
-    return
-  }
-
-  if (password.length < 6) {
-    res.status(400).json({ error: 'Password must be at least 6 characters' })
-    return
-  }
-
   try {
+    const {email, password} = validateRegistrationBody(req.body)
     const token = await register(email, password)
     
     return res.status(201).json({ token })
@@ -35,18 +16,8 @@ router.post('/register', async (req, res, next) => {
 })
 
 router.post('/login', async (req, res, next) => {
-  const { email, password } = req.body
-
-  if (
-    typeof email !== 'string' ||
-    typeof password !== 'string' ||
-    email.trim() === '' ||
-    password.trim() === ''
-  ) {
-    return res.status(400).json({ error: 'Invalid login or password' })
-  }
-
   try {
+    const { email, password } = validateLoginBody(req.body)
     const token = await login(email, password)
     
     return res.status(200).json({ token })
