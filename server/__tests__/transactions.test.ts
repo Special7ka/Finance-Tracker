@@ -99,6 +99,7 @@ describe('Transactions', () => {
     const createdIncomeTx = await createAndGetTransaction(token, {
       type: 'INCOME',
     })
+
     const createdIncomeTx2 = await createAndGetTransaction(token, {
       type: 'EXPENSE',
     })

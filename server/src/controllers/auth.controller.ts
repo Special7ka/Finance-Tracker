@@ -3,7 +3,7 @@ import { register, login } from '../services/auth.service'
 import {
   validateRegistrationBody,
   validateLoginBody,
-} from '../utils/auth.validators'
+} from '../utils/auth.validator'
 
 export const registerController = async (
   req: Request,

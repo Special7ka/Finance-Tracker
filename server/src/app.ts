@@ -1,11 +1,11 @@
 import express from 'express'
 import { notFound } from './middlewares/notFound'
 import { errorHandler } from './middlewares/errorHandler'
-import debug from './routes/debug'
-import authRouter from './routes/auth'
-import meRouter from './routes/me'
-import categoriesRouter from './routes/categories'
-import transactionsRouter from './routes/transactions'
+import debug from './routes/debug.routes'
+import authRouter from './routes/auth.routes'
+import meRouter from './routes/me.routes'
+import categoriesRouter from './routes/categories.routes'
+import transactionsRouter from './routes/transactions.routes'
 
 const app = express()
 
