@@ -5,6 +5,7 @@ import {
   updateCategory,
   deleteCategory,
 } from '../services/categories.service'
+import { BadRequestError } from '../errors'
 
 export const createCategoryController = async (
   req: Request,
@@ -15,7 +16,7 @@ export const createCategoryController = async (
   const name = req.body.name
 
   if (!name || typeof name !== 'string' || name.trim() === '') {
-    return res.status(400).json({ error: 'invalid name' })
+    throw new BadRequestError('Invalid name')
   }
 
   try {
@@ -52,7 +53,7 @@ export const updateCategoriesController = async (
   const name = req.body.name
 
   if (!name || typeof name !== 'string' || name.trim() === '') {
-    return res.status(400).json({ error: 'invalid name' })
+    throw new BadRequestError('Invalid name')
   }
 
   try {

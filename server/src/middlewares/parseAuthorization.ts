@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
+import { UnauthorizedError } from '../errors'
 
 export const authorization = (
   req: Request,
@@ -8,14 +9,12 @@ export const authorization = (
   const authHeaders = req.headers.authorization
 
   if (!authHeaders || !authHeaders.startsWith('Bearer ')) {
-    res.status(401).json({ error: 'Unauthorized' })
-    return
+    throw new UnauthorizedError('Unauthorized')
   }
 
   const token = authHeaders.split(' ')[1]
   if (!token) {
-    res.status(401).json({ error: 'Unauthorized' })
-    return
+    throw new UnauthorizedError('Unauthorized')
   }
   ;(req as any).token = token
 

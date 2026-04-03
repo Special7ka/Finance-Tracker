@@ -1,6 +1,7 @@
 import { getPrisma } from '../db/prisma'
 import { TransactionType } from '@prisma/client'
 import { NotFoundError } from '../errors'
+import { notFound } from '../middlewares/notFound'
 
 export async function createTransaction(
   userId: string,
@@ -19,7 +20,7 @@ export async function createTransaction(
     })
 
     if (userId !== category?.userId) {
-      throw new Error('Category not found')
+      throw new NotFoundError('Category not found')
     }
   }
 

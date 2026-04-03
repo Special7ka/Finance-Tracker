@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { authorization } from '../middlewares/parseAuthorization'
 import { verifyJWT } from '../middlewares/verifyJWT'
 import { getPrisma } from '../db/prisma'
+import { NotFoundError } from '../errors'
 
 const router = Router()
 
@@ -18,10 +19,9 @@ router.get('/', authorization, verifyJWT, async (req, res) => {
   })
 
   if (!userInfo) {
-    res.status(404).json({ error: 'User not found' })
-    return
+    throw new NotFoundError('User not found')
   }
-  return res.status(200).json(userInfo)
+  return res.json(userInfo)
 })
 
 export default router
