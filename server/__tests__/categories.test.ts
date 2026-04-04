@@ -46,7 +46,7 @@ describe('Categories', () => {
       .send({ name: 123 })
 
     expect(res.status).toBe(400)
-    expect(res.body.error).toBe('invalid name')
+    expect(res.body.error).toBe('Invalid name')
   })
   it('PATCH /categories/:id returns 200 + updated category', async () => {
     const token = await registerAndGetToken()
