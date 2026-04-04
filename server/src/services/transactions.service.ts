@@ -1,7 +1,6 @@
 import { getPrisma } from '../db/prisma'
 import { TransactionType } from '@prisma/client'
 import { NotFoundError } from '../errors'
-import { notFound } from '../middlewares/notFound'
 
 export async function createTransaction(
   userId: string,
@@ -76,6 +75,10 @@ export async function getTransactions(
     where.occurredAt = dateFilter
   }
 
+  if (query.categoryId !== undefined) {
+    where.categoryId = query.categoryId
+  }
+
   const transactions = await prisma.transaction.findMany({
     where,
     orderBy: {
@@ -89,7 +92,12 @@ export async function getTransactions(
 export async function updateTransaction(
   userId: string,
   transactionId: string,
-  data: any,
+  data: {
+    amount?: number
+    type?: TransactionType
+    occurredAt?: Date
+    categoryId?: string
+  },
 ) {
   const prisma = getPrisma()
 
