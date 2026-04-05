@@ -1,5 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
 import { UnauthorizedError } from '../errors'
+import jwt from 'jsonwebtoken'
+
+interface AuthPayload {
+  userId: string
+}
 
 export const authorization = (
   req: Request,
@@ -16,7 +21,14 @@ export const authorization = (
   if (!token) {
     throw new UnauthorizedError('Unauthorized')
   }
-  next()
+  const JWT = process.env.JWT_SECRET as string
 
-  return
+  try {
+    const decoded = jwt.verify(token, JWT) as AuthPayload
+
+    req.userId = decoded.userId
+    next()
+  } catch (e) {
+    throw new UnauthorizedError('Unauthorized')
+  }
 }

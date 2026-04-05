@@ -1,12 +1,11 @@
 import { Router } from 'express'
 import { authorization } from '../middlewares/parseAuthorization'
-import { verifyJWT } from '../middlewares/verifyJWT'
 import { getPrisma } from '../db/prisma'
 import { NotFoundError } from '../errors'
 
 const router = Router()
 
-router.get('/', authorization, verifyJWT, async (req, res) => {
+router.get('/', authorization, async (req, res) => {
   const userId = req.userId
   const prisma = getPrisma()
 

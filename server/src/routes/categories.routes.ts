@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import { verifyJWT } from '../middlewares/verifyJWT'
 import { authorization } from '../middlewares/parseAuthorization'
 import {
   createCategoryController,
@@ -10,12 +9,12 @@ import {
 
 const router = Router()
 
-router.post('/', authorization, verifyJWT, createCategoryController)
+router.post('/', authorization, createCategoryController)
 
-router.get('/', authorization, verifyJWT, getCategoryController)
+router.get('/', authorization, getCategoryController)
 
-router.patch('/:id', authorization, verifyJWT, updateCategoriesController)
+router.patch('/:id', authorization, updateCategoriesController)
 
-router.delete('/:id', authorization, verifyJWT, deleteCategoryController)
+router.delete('/:id', authorization, deleteCategoryController)
 
 export default router
