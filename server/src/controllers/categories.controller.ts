@@ -12,7 +12,7 @@ export const createCategoryController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const userId = (req as any).userId
+  const userId = req.userId!
   const name = req.body.name
 
   if (!name || typeof name !== 'string' || name.trim() === '') {
@@ -34,7 +34,7 @@ export const getCategoryController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const userId = (req as any).userId
+  const userId = req.userId!
   try {
     const categories = await getCategoriesByUserId(userId)
     return res.json(categories)
@@ -48,7 +48,7 @@ export const updateCategoriesController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const userId = (req as any).userId
+  const userId = req.userId!
   const { id: categoryID } = req.params as { id: string }
   const name = req.body.name
 

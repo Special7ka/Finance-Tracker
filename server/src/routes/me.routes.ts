@@ -7,7 +7,7 @@ import { NotFoundError } from '../errors'
 const router = Router()
 
 router.get('/', authorization, verifyJWT, async (req, res) => {
-  const userId = (req as any).userId
+  const userId = req.userId
   const prisma = getPrisma()
 
   const userInfo = await prisma.user.findUnique({

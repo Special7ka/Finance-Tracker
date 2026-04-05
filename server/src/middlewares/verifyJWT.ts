@@ -7,7 +7,7 @@ interface AuthPayload {
 }
 
 export const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
-  const token = (req as any).token
+  const token = req.headers.authorization
   if (!token) {
     throw new UnauthorizedError('Unauthorized')
   }
@@ -16,7 +16,7 @@ export const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
   try {
     const decoded = jwt.verify(token, JWT) as AuthPayload
 
-    ;(req as any).userId = decoded.userId
+    req.userId = decoded.userId
     next()
   } catch (e) {
     throw new UnauthorizedError('Unauthorized')

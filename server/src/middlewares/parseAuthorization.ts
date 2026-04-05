@@ -16,8 +16,6 @@ export const authorization = (
   if (!token) {
     throw new UnauthorizedError('Unauthorized')
   }
-  ;(req as any).token = token
-
   next()
 
   return
