@@ -3,6 +3,8 @@ import app from '../src/app'
 import { DEFAULT_CATEGORIES } from '../src/constants/defaultCategories'
 import { registerAndGetToken } from './helpers/register'
 import { getFirstUserCategory } from './helpers/categories'
+import { asyncWrapProviders } from 'async_hooks'
+import { error } from 'console'
 
 describe('Categories', () => {
   it('GET /categories without token returns 401', async () => {
@@ -47,6 +49,23 @@ describe('Categories', () => {
 
     expect(res.status).toBe(400)
     expect(res.body.error).toBe('Invalid name')
+  })
+  it('POST /categories with duplicate name returns 409', async () => {
+    const token = await registerAndGetToken()
+    const sameName = 'Travel'
+
+    await request(app)
+      .post('/categories')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ name: sameName })
+
+    const res = await request(app)
+      .post('/categories')
+      .set('Authorization', 'Bearer ' + token)
+      .send({ name: sameName })
+
+    expect(res.status).toBe(409)
+    expect(res.body.error).toBe('Category already exists')
   })
   it('PATCH /categories/:id returns 200 + updated category', async () => {
     const token = await registerAndGetToken()
