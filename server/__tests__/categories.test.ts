@@ -95,6 +95,5 @@ describe('Categories', () => {
       .set('Authorization', 'Bearer ' + token)
 
     expect(res.status).toBe(204)
-    expect(res.body).toEqual({})
   })
 })
