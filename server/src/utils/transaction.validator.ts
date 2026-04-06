@@ -26,6 +26,10 @@ const getFirstQueryValue = (value: unknown) => {
   return Array.isArray(value) ? value[0] : value
 }
 
+export const normalizeCategoryName = (name: string): string => {
+  return name.trim().toLowerCase()
+}
+
 export function validateCreateTransaction(
   body: unknown,
 ): CreateTransactionValidated {
