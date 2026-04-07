@@ -6,6 +6,10 @@ import {
   deleteCategory,
 } from '../services/categories.service'
 import { BadRequestError } from '../errors'
+import {
+  validateCreateCategory,
+  validateUpdateCategory,
+} from '../utils/categories.validator'
 
 export const createCategoryController = async (
   req: Request,
@@ -13,14 +17,10 @@ export const createCategoryController = async (
   next: NextFunction,
 ) => {
   const userId = req.userId!
-  const name = req.body.name
-
-  if (!name || typeof name !== 'string' || name.trim() === '') {
-    throw new BadRequestError('Invalid name')
-  }
 
   try {
-    const newCategory = await createCategory(userId, name)
+    const data = validateCreateCategory(req.body)
+    const newCategory = await createCategory(userId, data)
     return res
       .status(201)
       .json({ message: 'successfully created', category: newCategory })
@@ -50,14 +50,10 @@ export const updateCategoriesController = async (
 ) => {
   const userId = req.userId!
   const { id: categoryID } = req.params as { id: string }
-  const name = req.body.name
-
-  if (!name || typeof name !== 'string' || name.trim() === '') {
-    throw new BadRequestError('Invalid name')
-  }
 
   try {
-    const newCategory = await updateCategory(userId, categoryID, name)
+    const data = validateUpdateCategory(req.body)
+    const newCategory = await updateCategory(userId, categoryID, data)
     return res
       .status(200)
       .json({ message: 'successfully updated', category: newCategory })
@@ -71,7 +67,7 @@ export const deleteCategoryController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const userId = (req as any).userId
+  const userId = req.userId!
   const { id: categoryID } = req.params as { id: string }
 
   try {

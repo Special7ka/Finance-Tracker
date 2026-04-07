@@ -1,13 +1,20 @@
 import { getPrisma } from '../db/prisma'
 import { ConflictError, NotFoundError } from '../errors'
+import {
+  CreateCategoryValidated,
+  UpdateCategoryValidated,
+} from '../types/categories'
 
-const normalizeCategoryName = (name: string): string => {
+const normalizedName = (name: string): string => {
   return name.trim().toLowerCase()
 }
 
-export async function createCategory(userId: string, name: string) {
+export async function createCategory(
+  userId: string,
+  body: CreateCategoryValidated,
+) {
   const prisma = getPrisma()
-  const normalizeName = normalizeCategoryName(name)
+  const normalizeName = normalizedName(body.name)
 
   const duplicateCategory = await prisma.category.findFirst({
     where: {
@@ -40,38 +47,46 @@ export async function getCategoriesByUserId(userId: string) {
 export async function updateCategory(
   userId: string,
   categoryId: string,
-  newName: string,
+  body: UpdateCategoryValidated,
 ) {
   const prisma = getPrisma()
-  const normalizeNewName = normalizeCategoryName(newName)
 
   const userCategory = await prisma.category.findFirst({
-    where: { id: categoryId, userId: userId },
+    where: { id: categoryId, userId },
   })
+
   if (!userCategory) {
     throw new NotFoundError('Category not found')
   }
-  if (userCategory.name === normalizeNewName) {
-    return userCategory
+
+  const updateData: UpdateCategoryValidated = {}
+
+  if (body.name !== undefined) {
+    const normalizedNewName = normalizedName(body.name)
+
+    if (userCategory.name === normalizedNewName) {
+      return userCategory
+    }
+
+    const exists = await prisma.category.findFirst({
+      where: {
+        userId,
+        name: normalizedNewName,
+        NOT: { id: categoryId },
+      },
+    })
+
+    if (exists) {
+      throw new ConflictError('Category already exists')
+    }
+
+    updateData.name = normalizedNewName
   }
 
-  const exists = await prisma.category.findFirst({
-    where: {
-      userId: userId,
-      name: normalizeNewName,
-      NOT: { id: categoryId },
-    },
-  })
-  if (exists) {
-    throw new ConflictError('Category already exists')
-  }
-
-  const newCategory = await prisma.category.update({
+  return prisma.category.update({
     where: { id: categoryId },
-    data: { name: normalizeNewName },
+    data: updateData,
   })
-
-  return newCategory
 }
 
 export async function deleteCategory(userId: string, categoryId: string) {
