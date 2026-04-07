@@ -3,15 +3,13 @@ import bcrypt from 'bcrypt'
 import jsonwebtoken from 'jsonwebtoken'
 import { DEFAULT_CATEGORIES } from '../constants/defaultCategories'
 import { UnauthorizedError, ConflictError } from '../errors'
+import { UserCredentials } from '../types/auth'
 
-export async function register(
-  email: string,
-  password: string,
-): Promise<string> {
+export async function register(data: UserCredentials): Promise<string> {
   const prisma = getPrisma()
-  const user = await prisma.user.findUnique({ where: { email } })
+  const user = await prisma.user.findUnique({ where: { email: data.email } })
   const userCategories = new Array()
-  const cryptPass = await bcrypt.hash(password, 10)
+  const cryptPass = await bcrypt.hash(data.password, 10)
 
   if (user) {
     throw new ConflictError('User already exists')
@@ -19,7 +17,7 @@ export async function register(
 
   const newUser = await prisma.user.create({
     data: {
-      email: email,
+      email: data.email,
       passwordHash: cryptPass,
     },
   })
@@ -44,15 +42,15 @@ export async function register(
   return token
 }
 
-export async function login(email: string, password: string): Promise<string> {
+export async function login(data: UserCredentials): Promise<string> {
   const prisma = getPrisma()
-  const user = await prisma.user.findUnique({ where: { email } })
+  const user = await prisma.user.findUnique({ where: { email: data.email } })
 
   if (!user) {
     throw new UnauthorizedError('Invalid credentials')
   }
 
-  const verif = await bcrypt.compare(password, user.passwordHash)
+  const verif = await bcrypt.compare(data.password, user.passwordHash)
 
   if (!verif) {
     throw new UnauthorizedError('Invalid credentials')
