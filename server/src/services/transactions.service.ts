@@ -4,21 +4,19 @@ import { NotFoundError } from '../errors'
 import {
   GetTransactionValidated,
   UpdateTransactionValidated,
+  CreateTransactionValidated,
 } from '../types/transactions'
 
 export async function createTransaction(
   userId: string,
-  type: TransactionType,
-  occurredAt: Date,
-  amount: number,
-  categoryId?: string,
+  data: CreateTransactionValidated,
 ) {
   const prisma = getPrisma()
 
-  if (categoryId) {
+  if (data.categoryId) {
     const category = await prisma.category.findUnique({
       where: {
-        id: categoryId,
+        id: data.categoryId,
       },
     })
 
@@ -30,10 +28,10 @@ export async function createTransaction(
   const newTransaction = await prisma.transaction.create({
     data: {
       userId: userId,
-      type: type,
-      occurredAt: occurredAt,
-      categoryId: categoryId,
-      amount: amount,
+      type: data.type,
+      occurredAt: data.occurredAt,
+      categoryId: data.categoryId,
+      amount: data.amount,
     },
   })
 

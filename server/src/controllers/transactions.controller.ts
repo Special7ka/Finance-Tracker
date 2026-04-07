@@ -16,19 +16,11 @@ export const createTransactionController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const userId = (req as any).userId
+  const userId = req.userId!
 
   try {
-    const { amount, type, occurredAt, categoryId } = validateCreateTransaction(
-      req.body,
-    )
-    const transaction = await createTransaction(
-      userId,
-      type,
-      occurredAt,
-      amount,
-      categoryId,
-    )
+    const data = validateCreateTransaction(req.body)
+    const transaction = await createTransaction(userId, data)
     return res.status(201).json({ transaction })
   } catch (e) {
     return next(e)
@@ -40,7 +32,7 @@ export const getTransactionsController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const userId = (req as any).userId
+  const userId = req.userId!
 
   try {
     const filters = validateGetTransaction(req.query)
@@ -56,7 +48,7 @@ export const updateTransactionController = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const userId = (req as any).userId
+  const userId = req.userId!
   const { id: transactionId } = req.params as { id: string }
 
   try {
@@ -74,7 +66,7 @@ export const deleteTransactionController = async (
   next: NextFunction,
 ) => {
   const { id: transactionId } = req.params as { id: string }
-  const userId = (req as any).userId
+  const userId = req.userId!
 
   try {
     await deleteTransaction(userId, transactionId)
