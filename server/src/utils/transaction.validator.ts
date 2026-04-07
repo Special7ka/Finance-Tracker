@@ -1,33 +1,12 @@
-import { TransactionType } from '@prisma/client'
 import { BadRequestError } from '../errors'
-
-interface CreateTransactionValidated {
-  amount: number
-  type: TransactionType
-  occurredAt: Date
-  categoryId?: string
-}
-
-interface UpdateTransactionValidated {
-  amount?: number
-  type?: TransactionType
-  occurredAt?: Date
-  categoryId?: string
-}
-
-interface GetTransactionValidated {
-  type?: TransactionType
-  categoryId?: string
-  from?: Date
-  to?: Date
-}
+import {
+  CreateTransactionValidated,
+  UpdateTransactionValidated,
+  GetTransactionValidated,
+} from '../types/transactions'
 
 const getFirstQueryValue = (value: unknown) => {
   return Array.isArray(value) ? value[0] : value
-}
-
-export const normalizeCategoryName = (name: string): string => {
-  return name.trim().toLowerCase()
 }
 
 export function validateCreateTransaction(

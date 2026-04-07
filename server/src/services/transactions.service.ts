@@ -1,6 +1,10 @@
 import { getPrisma } from '../db/prisma'
 import { TransactionType } from '@prisma/client'
 import { NotFoundError } from '../errors'
+import {
+  GetTransactionValidated,
+  UpdateTransactionValidated,
+} from '../types/transactions'
 
 export async function createTransaction(
   userId: string,
@@ -38,12 +42,7 @@ export async function createTransaction(
 
 export async function getTransactions(
   userId: string,
-  query: {
-    type?: TransactionType
-    categoryId?: string
-    from?: Date
-    to?: Date
-  },
+  query: GetTransactionValidated,
 ) {
   const prisma = getPrisma()
   let where: {
@@ -92,12 +91,7 @@ export async function getTransactions(
 export async function updateTransaction(
   userId: string,
   transactionId: string,
-  data: {
-    amount?: number
-    type?: TransactionType
-    occurredAt?: Date
-    categoryId?: string
-  },
+  data: UpdateTransactionValidated,
 ) {
   const prisma = getPrisma()
 
