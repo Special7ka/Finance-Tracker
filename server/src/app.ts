@@ -6,6 +6,7 @@ import authRouter from './routes/auth.routes'
 import meRouter from './routes/me.routes'
 import categoriesRouter from './routes/categories.routes'
 import transactionsRouter from './routes/transactions.routes'
+import summaryRouter from './routes/summary.routes'
 
 const app = express()
 
@@ -15,7 +16,7 @@ app.use('/auth', authRouter)
 app.use('/me', meRouter)
 app.use('/categories', categoriesRouter)
 app.use('/transactions', transactionsRouter)
-
+app.use('/summary', summaryRouter)
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' })
 })
