@@ -12,7 +12,7 @@ export const registerController = async (
 ) => {
   try {
     const { email, password } = validateRegistrationBody(req.body)
-    const token = await register(email, password)
+    const token = await register({email,password})
 
     return res.status(201).json({ token })
   } catch (e) {
@@ -27,7 +27,7 @@ export const loginController = async (
 ) => {
   try {
     const { email, password } = validateLoginBody(req.body)
-    const token = await login(email, password)
+    const token = await login({email,password})
 
     return res.status(200).json({ token })
   } catch (e) {

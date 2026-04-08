@@ -7,7 +7,7 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "commonjs",
+    "module": "node16",
     "target": "ES2022",
     "types": ["node", "vitest/globals"],
     // For nodejs:
@@ -20,7 +20,7 @@
     //"declaration": true,
    // "declarationMap": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     // Stricter Typechecking Options
    // "noUncheckedIndexedAccess": true,
     //"exactOptionalPropertyTypes": true,
