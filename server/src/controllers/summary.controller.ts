@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { getSummary } from '../services/summary.service'
+import { validateGetSummary } from '../utils/summary.validator'
 
 export const getSummaryController = async (
   req: Request,
@@ -9,9 +10,10 @@ export const getSummaryController = async (
   const userId = req.userId!
 
   try {
-    const userStatement  = await getSummary(userId)
+    const filters = validateGetSummary(req.query)
+    const userStatement  = await getSummary(userId,filters)
     return res.status(200).json(userStatement)
   } catch(e){
-    next(e)
+    return next(e)
   }
 }
