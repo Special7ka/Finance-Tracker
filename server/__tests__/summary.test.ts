@@ -17,4 +17,9 @@ describe("Summary", () =>{
         expect(res.body.expense).toBe(40)
         expect(res.body.balance).toBe(60)
     })
+
+    it("GET /summary without token returns 401", async () => {
+        const res = await request(app).get("/summary")
+        expect(res.status).toBe(401)
+  })
 })
