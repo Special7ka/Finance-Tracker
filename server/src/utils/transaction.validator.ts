@@ -4,6 +4,7 @@ import {
   UpdateTransactionValidated,
   GetTransactionValidated,
 } from '../types/transactions'
+import { validateAndParseDate } from './date.validator'
 
 const getFirstQueryValue = (value: unknown) => {
   return Array.isArray(value) ? value[0] : value
@@ -92,31 +93,11 @@ export function validateGetTransaction(
   }
 
   if (from !== undefined) {
-    if (typeof from !== 'string' || from.trim() === '') {
-      throw new BadRequestError('Invalid from')
-    }
-
-    const fromDate = new Date(from)
-
-    if (Number.isNaN(fromDate.getTime())) {
-      throw new BadRequestError('Invalid from')
-    }
-
-    data.from = fromDate
+    data.from = validateAndParseDate(from, 'from')
   }
 
   if (to !== undefined) {
-    if (typeof to !== 'string' || to.trim() === '') {
-      throw new BadRequestError('Invalid to')
-    }
-
-    const toDate = new Date(to)
-
-    if (Number.isNaN(toDate.getTime())) {
-      throw new BadRequestError('Invalid to')
-    }
-
-    data.to = toDate
+    data.to = validateAndParseDate(to, 'to')
   }
 
   return data
@@ -155,17 +136,7 @@ export function validateUpdateTransaction(
   }
 
   if (occurredAt !== undefined) {
-    if (typeof occurredAt !== 'string' || occurredAt.trim() === '') {
-      throw new BadRequestError('Invalid occurredAt')
-    }
-
-    const occurredDate = new Date(occurredAt)
-
-    if (Number.isNaN(occurredDate.getTime())) {
-      throw new BadRequestError('Invalid occurredAt')
-    }
-
-    data.occurredAt = occurredDate
+    data.occurredAt = validateAndParseDate(occurredAt, 'occurredAt')
   }
 
   if (categoryId !== undefined) {
