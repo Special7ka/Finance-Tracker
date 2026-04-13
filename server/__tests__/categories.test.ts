@@ -37,7 +37,7 @@ describe('Categories', () => {
 
     expect(res.status).toBe(201)
     expect(res.body.category.id).toBeDefined()
-    expect(res.body.category.name).toBe('Travel')
+    expect(res.body.category.name).toBe('travel')
   })
   it('POST /categories with invalid body 400', async () => {
     const token = await registerAndGetToken()
@@ -52,7 +52,7 @@ describe('Categories', () => {
   })
   it('POST /categories with duplicate name returns 409', async () => {
     const token = await registerAndGetToken()
-    const sameName = 'Travel'
+    const sameName = 'travel'
 
     await request(app)
       .post('/categories')
@@ -79,7 +79,7 @@ describe('Categories', () => {
       .send({ name: newName })
 
     expect(res.status).toBe(200)
-    expect(res.body.category.name).toBe(newName)
+    expect(res.body.category.name).toBe(newName.toLocaleLowerCase())
   })
   it('PATCH /categories/:id invalid body returns 400', async () => {
     const token = await registerAndGetToken()
