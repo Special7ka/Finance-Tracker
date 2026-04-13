@@ -1,5 +1,5 @@
 import { getPrisma } from '../db/prisma'
-import { TransactionType } from '@prisma/client'
+import { Prisma, PrismaClient, TransactionType } from '@prisma/client'
 import { NotFoundError } from '../errors'
 import {
   GetTransactionValidated,
@@ -43,19 +43,11 @@ export async function getTransactions(
   query: GetTransactionValidated,
 ) {
   const prisma = getPrisma()
-  let where: {
-    userId: string
-    type?: TransactionType
-    categoryId?: string
-    occurredAt?: {
-      gte?: Date
-      lte?: Date
-    }
-  } = {
+  const where: Prisma.TransactionWhereInput = {
     userId: userId,
   }
 
-  const dateFilter: { gte?: Date; lte?: Date } = {}
+  const dateFilter: Prisma.DateTimeFilter = {}
 
   if (query.from !== undefined) {
     dateFilter.gte = query.from
@@ -98,6 +90,11 @@ export async function updateTransaction(
       id: transactionId,
     },
   })
+
+  if (!transaction || transaction.userId !== userId) {
+    throw new NotFoundError('Transaction not found')
+  }
+
   if (data.categoryId !== undefined) {
     const category = await prisma.category.findUnique({
       where: {
@@ -107,10 +104,6 @@ export async function updateTransaction(
     if (category?.userId !== userId) {
       throw new NotFoundError('Category not found')
     }
-  }
-
-  if (!transaction || transaction.userId !== userId) {
-    throw new NotFoundError('Transaction not found')
   }
 
   const newTransaction = await prisma.transaction.update({
