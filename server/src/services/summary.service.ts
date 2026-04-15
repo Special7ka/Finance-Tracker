@@ -57,8 +57,27 @@ export const getSummaryByCategory = async (userId: string) => {
     where,
   })
 
-  return userTransactionsByCategory.map((item) => ({
-    categoryId: item.categoryId,
-    amount: item._sum.amount ?? 0,
-  }))
+  const userCategory = await prisma.category.findMany({where:{
+    userId:userId,
+  }})
+
+  const mapCategory:Record<string,string> = {}
+
+  userCategory.forEach((category) =>{
+    mapCategory[category.id] = category.name
+  })
+  
+
+  return userTransactionsByCategory.map((item) => {
+    const name = item.categoryId !== null ? mapCategory[item.categoryId]
+     ?? "Unknown" 
+     : "Uncategorized"
+
+
+    return {
+      categoryId: item.categoryId,
+      amount: item._sum.amount ?? 0,
+      name: name,
+    }
+  })
 }
