@@ -2,8 +2,8 @@ import request from 'supertest'
 import app from '../src/app'
 import { registerAndGetToken } from './helpers/register'
 import { createAndGetTransaction } from './helpers/transactions'
-import { authorization } from '../src/middlewares/parseAuthorization'
-import { registerController } from '../src/controllers/auth.controller'
+import { createAndGetCategory } from './helpers/categories'
+import { SummaryByCategoryItem } from '../src/types/summary'
 
 describe("Summary", () =>{
     it("GET /summary without filters returns 200 and summary statement", async ()=>{
@@ -63,5 +63,45 @@ describe("Summary", () =>{
         expect(res.body.income).toBe(0)
         expect(res.body.expense).toBe(0)
         expect(res.body.balance).toBe(0)
+    })
+    it("GET /summary/by-category returns expenses grouped by category",async()=>{
+        const token = await registerAndGetToken()
+
+        const travelCategory = await createAndGetCategory(token,{name:"travel"})
+        const sportCategory = await createAndGetCategory(token,{name:"sport"})
+
+
+        await createAndGetTransaction(token,{amount:20,categoryId:travelCategory.categoryId,type:"EXPENSE",})
+        await createAndGetTransaction(token,{amount:5,categoryId:travelCategory.categoryId,type:"EXPENSE",})
+
+        await createAndGetTransaction(token,{amount:100, categoryId:sportCategory.categoryId,type:"EXPENSE",})
+
+        const res = await request(app).get("/summary/by-category").set('Authorization', 'Bearer ' + token)
+        const body = res.body as SummaryByCategoryItem[]
+
+        const travel = body.find(category => category.name === "travel") 
+        const sport = body.find(category => category.name === "sport") 
+
+        console.log(travelCategory, sportCategory)
+        console.log(body)
+
+        expect(res.status).toBe(200)
+        expect(body.length).toBe(2)
+
+        expect(travel).toBeDefined()
+        expect(sport).toBeDefined()
+
+        expect(travel!.amount).toBe(25)
+        expect(sport!.amount).toBe(100)
+
+    })
+
+    it("GET /summary/by-category without expense transactions", async ()=>{
+        const token = await registerAndGetToken()
+
+        const res = await request(app).get("/summary/by-category").set('Authorization', 'Bearer ' + token)
+
+        expect(res.status).toBe(200)
+        expect(res.body).toEqual([])
     })
 })

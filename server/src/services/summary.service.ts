@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { getPrisma } from '../db/prisma'
-import { GetSummaryValidated } from '../types/summary'
+import { GetSummaryValidated, SummaryByCategoryItem } from '../types/summary'
+
 
 export const getSummary = async (
   userId: string,
@@ -42,7 +43,7 @@ export const getSummary = async (
   return { expense, income, balance }
 }
 
-export const getSummaryByCategory = async (userId: string) => {
+export const getSummaryByCategory = async (userId: string): Promise<SummaryByCategoryItem[]> => {
   const prisma = getPrisma()
   const where: Prisma.TransactionWhereInput = {
     userId: userId,
@@ -69,10 +70,7 @@ export const getSummaryByCategory = async (userId: string) => {
   
 
   return userTransactionsByCategory.map((item) => {
-    const name = item.categoryId !== null ? mapCategory[item.categoryId]
-     ?? "Unknown" 
-     : "Uncategorized"
-
+    const name = item.categoryId !== null ? mapCategory[item.categoryId] ?? "Unknown" : "Uncategorized"
 
     return {
       categoryId: item.categoryId,
