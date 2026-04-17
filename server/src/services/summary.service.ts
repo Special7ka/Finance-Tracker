@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { getPrisma } from '../db/prisma'
 import { GetSummaryValidated, SummaryByCategoryItem } from '../types/summary'
-
+import { TransactionType } from '@prisma/client'
 
 export const getSummary = async (
   userId: string,
@@ -43,11 +43,14 @@ export const getSummary = async (
   return { expense, income, balance }
 }
 
-export const getSummaryByCategory = async (userId: string): Promise<SummaryByCategoryItem[]> => {
+export const getSummaryByCategory = async (
+  userId: string,
+  filters: GetSummaryValidated,
+): Promise<SummaryByCategoryItem[]> => {
   const prisma = getPrisma()
   const where: Prisma.TransactionWhereInput = {
     userId: userId,
-    type: 'EXPENSE',
+    type: filters.type ?? 'EXPENSE',
   }
 
   const userTransactionsByCategory = await prisma.transaction.groupBy({
@@ -58,19 +61,23 @@ export const getSummaryByCategory = async (userId: string): Promise<SummaryByCat
     where,
   })
 
-  const userCategory = await prisma.category.findMany({where:{
-    userId:userId,
-  }})
+  const userCategory = await prisma.category.findMany({
+    where: {
+      userId: userId,
+    },
+  })
 
-  const mapCategory:Record<string,string> = {}
+  const mapCategory: Record<string, string> = {}
 
-  userCategory.forEach((category) =>{
+  userCategory.forEach((category) => {
     mapCategory[category.id] = category.name
   })
-  
 
   return userTransactionsByCategory.map((item) => {
-    const name = item.categoryId !== null ? mapCategory[item.categoryId] ?? "Unknown" : "Uncategorized"
+    const name =
+      item.categoryId !== null
+        ? (mapCategory[item.categoryId] ?? 'Unknown')
+        : 'Uncategorized'
 
     return {
       categoryId: item.categoryId,

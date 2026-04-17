@@ -27,7 +27,8 @@ export const getSummaryByCategoryController = async (
   const userId = req.userId!
 
   try {
-    const userStatementByCategory = await getSummaryByCategory(userId)
+    const filters = validateGetSummary(req.query)
+    const userStatementByCategory = await getSummaryByCategory(userId, filters)
     return res.status(200).json(userStatementByCategory)
   } catch (e) {
     return next(e)
