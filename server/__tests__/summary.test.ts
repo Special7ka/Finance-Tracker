@@ -171,4 +171,13 @@ describe('Summary', () => {
     expect(travel).toBeDefined()
     expect(travel!.amount).toBe(35)
   })
+
+  it('GET /summary/by-category with invalid type query returns 400', async () => {
+    const token = await registerAndGetToken()
+    const res = await request(app)
+      .get('/summary/by-category?type=ERROR')
+      .set('Authorization', 'Bearer ' + token)
+
+    expect(res.status).toBe(400)
+  })
 })
