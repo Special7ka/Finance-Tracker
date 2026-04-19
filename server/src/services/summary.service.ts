@@ -61,6 +61,12 @@ export const getSummaryByCategory = async (
     where,
   })
 
+  let total = 0
+
+  userTransactionsByCategory.forEach((category) => {
+    total += category._sum.amount ?? 0
+  })
+
   const userCategory = await prisma.category.findMany({
     where: {
       userId: userId,
@@ -78,11 +84,13 @@ export const getSummaryByCategory = async (
       item.categoryId !== null
         ? (mapCategory[item.categoryId] ?? 'Unknown')
         : 'Uncategorized'
+    const amount = item._sum.amount ?? 0
 
     return {
       categoryId: item.categoryId,
-      amount: item._sum.amount ?? 0,
+      amount: amount,
       name: name,
+      percentage: total ? (amount * 100) / total : 0,
     }
   })
 }

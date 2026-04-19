@@ -10,4 +10,5 @@ export interface SummaryByCategoryItem {
   categoryId: string | null
   amount: number
   name: string
+  percentage: number
 }

@@ -129,6 +129,9 @@ describe('Summary', () => {
 
     expect(travel!.amount).toBe(25)
     expect(sport!.amount).toBe(100)
+
+    expect(travel!.percentage).toBe(20)
+    expect(sport!.percentage).toBe(80)
   })
 
   it('GET /summary/by-category without expense transactions', async () => {
