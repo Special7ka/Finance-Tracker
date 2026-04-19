@@ -183,4 +183,31 @@ describe('Summary', () => {
 
     expect(res.status).toBe(400)
   })
+
+  it('GET /summary/by-category with one category returns 200 and correct percentage', async () => {
+    const token = await registerAndGetToken()
+
+    const travelCategory = await createAndGetCategory(token, { name: 'travel' })
+
+    await createAndGetTransaction(token, {
+      amount: 20,
+      categoryId: travelCategory.categoryId,
+      type: 'EXPENSE',
+    })
+
+    const res = await request(app)
+      .get('/summary/by-category')
+      .set('Authorization', 'Bearer ' + token)
+
+    const body = res.body as SummaryByCategoryItem[]
+
+    expect(res.status).toBe(200)
+
+    const travel = body.find((category) => category.name === 'travel')
+
+    expect(body.length).toBe(1)
+    expect(travel).toBeDefined()
+    expect(travel!.amount).toBe(20)
+    expect(travel!.percentage).toBe(100)
+  })
 })
