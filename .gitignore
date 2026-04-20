@@ -1,4 +1,13 @@
-	
+# server
+server/node_modules
+server/dist
+server/.env
+
+# client (на будущее)
+client/node_modules
+client/dist
+client/.env
+
 # Logs
 logs
 *.log
