@@ -1,3 +1,3 @@
-export const RegisterPage = () =>{
-    return <>Register page</>
+export const RegisterPage = () => {
+  return <>Register page</>
 }

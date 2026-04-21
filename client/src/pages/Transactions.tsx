@@ -1,3 +1,3 @@
-export const TransactionsPage = () =>{
-    return <>Transactions page</>
+export const TransactionsPage = () => {
+  return <>Transactions page</>
 }
