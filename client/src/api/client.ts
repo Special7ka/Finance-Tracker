@@ -10,7 +10,6 @@ export const postAuth = async (
       email,
       password,
     })
-    console.table(res.data)
     return res.data
   } catch (e) {
     throw e
@@ -18,9 +17,9 @@ export const postAuth = async (
 }
 
 export const loginApi = async (email: string, password: string) => {
-  postAuth('http://localhost:3000/auth/login', email, password)
+  return postAuth('http://localhost:3000/auth/login', email, password)
 }
 
 export const registerApi = async (email: string, password: string) => {
-  postAuth('http://localhost:3000/auth/register', email, password)
+  return postAuth('http://localhost:3000/auth/register', email, password)
 }

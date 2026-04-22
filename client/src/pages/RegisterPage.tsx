@@ -27,7 +27,9 @@ export const RegisterPage = () => {
             const data = await registerApi(email, password)
             localStorage.setItem('token', data.token)
             navigate('/transactions', { replace: true })
-          } catch (e) {}
+          } catch (e) {
+            console.log(e)
+          }
         }}
       >
         <input
