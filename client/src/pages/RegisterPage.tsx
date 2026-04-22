@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Navigate } from 'react-router-dom'
+import { registerApi } from '../api/client'
 
 export const RegisterPage = () => {
   const [email, setEmail] = useState('')
@@ -17,14 +18,16 @@ export const RegisterPage = () => {
     <>
       Register
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault()
           if (password !== confirmPassword) {
-            console.log('Pass dont match')
             return
           }
-          localStorage.setItem('token', 'some-token-code')
-          navigate('/transactions', { replace: true })
+          try {
+            const data = await registerApi(email, password)
+            localStorage.setItem('token', data.token)
+            navigate('/transactions', { replace: true })
+          } catch (e) {}
         }}
       >
         <input

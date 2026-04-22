@@ -9,6 +9,5 @@ export const ProtectedRoute = ({ children }: props) => {
   if (!token) {
     return <Navigate to="/login" />
   }
-
   return children
 }

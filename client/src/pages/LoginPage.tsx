@@ -18,7 +18,6 @@ export const LoginPage = () => {
       <form
         onSubmit={async (e) => {
           e.preventDefault()
-
           try {
             const data = await loginApi(email, password)
             localStorage.setItem('token', data.token)
