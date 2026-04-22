@@ -7,11 +7,13 @@ import meRouter from './routes/me.routes'
 import categoriesRouter from './routes/categories.routes'
 import transactionsRouter from './routes/transactions.routes'
 import summaryRouter from './routes/summary.routes'
+import cors from 'cors'
 
 const app = express()
 
 app.use(express.json())
 app.use(debug)
+app.use(cors())
 app.use('/auth', authRouter)
 app.use('/me', meRouter)
 app.use('/categories', categoriesRouter)
