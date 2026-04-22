@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Navigate } from 'react-router-dom'
+import { loginApi } from '../api/client'
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('')
@@ -15,10 +16,14 @@ export const LoginPage = () => {
     <>
       Login
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault()
-          localStorage.setItem('token', 'some-token-code')
-          navigate('/transactions', { replace: true })
+
+          try {
+            const data = await loginApi(email, password)
+            localStorage.setItem('token', data.token)
+            navigate('/transactions', { replace: true })
+          } catch (e) {}
         }}
       >
         <input
