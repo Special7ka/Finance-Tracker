@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Navigate } from 'react-router-dom'
-import { loginApi } from '../api/client'
+import { loginApi } from '../api/auth'
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('')

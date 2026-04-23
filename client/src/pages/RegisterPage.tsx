@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Navigate } from 'react-router-dom'
-import { registerApi } from '../api/client'
+import { registerApi } from '../api/auth'
 
 export const RegisterPage = () => {
   const [email, setEmail] = useState('')
