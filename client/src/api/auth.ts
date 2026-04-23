@@ -1,3 +1,4 @@
+import { Meta } from 'react-router-dom'
 import { api } from './client'
 
 export const postAuth = async (
@@ -6,6 +7,7 @@ export const postAuth = async (
   password: string,
 ) => {
   try {
+    console.log(import.meta.env.VITE_API_URL)
     const res = await api.post(url, {
       email,
       password,
