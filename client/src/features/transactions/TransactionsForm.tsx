@@ -17,7 +17,8 @@ export const TransactionsForm = () => {
     const fetchCategories = async () => {
       try {
         const res = await api.get('/categories')
-        setCategories(res.data.categories)
+        console.log(res.data)
+        setCategories(res.data)
       } catch (e) {
         console.log(e)
       }
