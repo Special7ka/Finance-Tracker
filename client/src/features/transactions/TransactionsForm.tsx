@@ -17,7 +17,6 @@ export const TransactionsForm = () => {
     const fetchCategories = async () => {
       try {
         const res = await api.get('/categories')
-        console.log(res.data)
         setCategories(res.data)
       } catch (e) {
         console.log(e)
@@ -44,6 +43,12 @@ export const TransactionsForm = () => {
             categoryId: categoryId || null,
             occurredAt,
           })
+
+          setAmount('')
+          setCategoryId('')
+          setOccurredAt('')
+
+          alert('Transaction created')
         } catch (e) {
           console.log(e)
         }
