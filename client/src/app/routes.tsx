@@ -4,6 +4,7 @@ import { RegisterPage } from '../pages/RegisterPage'
 import { TransactionsPage } from '../pages/TransactionsPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 import { ProtectedRoute } from '../components/ProtectedRoute'
+import { AppLayout } from '../components/AppLayout'
 
 export const AppRoutes = () => {
   const token = localStorage.getItem('token')
@@ -25,7 +26,9 @@ export const AppRoutes = () => {
         path="/transactions"
         element={
           <ProtectedRoute>
-            <TransactionsPage />
+            <AppLayout>
+              <TransactionsPage />
+            </AppLayout>
           </ProtectedRoute>
         }
       />
