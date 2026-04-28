@@ -11,9 +11,9 @@ import cors from 'cors'
 
 const app = express()
 
+app.use(cors())
 app.use(express.json())
 app.use(debug)
-app.use(cors())
 app.use('/auth', authRouter)
 app.use('/me', meRouter)
 app.use('/categories', categoriesRouter)
