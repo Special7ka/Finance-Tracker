@@ -55,6 +55,7 @@ describe('Transactions', () => {
       expect(res.body.error).toBeDefined()
     })
   })
+
   describe('GET /transactions', () => {
     describe('base list', () => {
       it('should return 200 and transaction list', async () => {
@@ -76,6 +77,7 @@ describe('Transactions', () => {
         expect(tx.type).toBe(createdTx.type)
       })
     })
+
     describe('auth', () => {
       it('should return 401 for invalid token', async () => {
         const invalidToken = 'Invalid'
