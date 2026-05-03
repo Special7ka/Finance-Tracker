@@ -11,6 +11,23 @@ import { randomUUID } from 'crypto'
 
 describe('Transactions', () => {
   describe('POST /transactions', () => {
+    it('should return 401 for invalid token', async () => {
+      const invalidToken = 'Invalid'
+
+      const res = await request(app)
+        .post('/transactions')
+        .set('Authorization', 'Bearer ' + invalidToken)
+
+      expect(res.status).toBe(401)
+    })
+
+    it('should return 401 without token', async () => {
+      const res = await request(app).post('/transactions').send({})
+
+      expect(res.status).toBe(401)
+      expect(res.body.error).toBeDefined()
+    })
+
     it('should create transaction and return 201', async () => {
       const type = 'EXPENSE'
       const occurredAt = new Date().toISOString()
@@ -29,13 +46,6 @@ describe('Transactions', () => {
       expect(res.body.transaction.type).toBe(type)
       expect(res.body.transaction.occurredAt).toBe(occurredAt)
       expect(res.body.transaction.id).toBeDefined()
-    })
-
-    it('should return 401 without token', async () => {
-      const res = await request(app).post('/transactions').send({})
-
-      expect(res.status).toBe(401)
-      expect(res.body.error).toBeDefined()
     })
 
     it('should return 400 for invalid body', async () => {
@@ -271,6 +281,22 @@ describe('Transactions', () => {
   })
 
   describe('PATCH /transactions/:id', () => {
+    it('should return 401 for invalid token', async () => {
+      const invalidToken = 'Invalid'
+
+      const res = await request(app)
+        .patch('/transactions/some-id')
+        .set('Authorization', 'Bearer ' + invalidToken)
+
+      expect(res.status).toBe(401)
+    })
+    it('should return 401 without token', async () => {
+      const res = await request(app).patch('/transactions/some-id').send({})
+
+      expect(res.status).toBe(401)
+      expect(res.body.error).toBeDefined()
+    })
+
     it('should return 200 and updated transactions', async () => {
       const token = await registerAndGetToken()
       const createdTx = await createAndGetTransaction(token)
@@ -330,21 +356,6 @@ describe('Transactions', () => {
       expect(res.body).toEqual({ error: 'Invalid amount' })
     })
 
-    it('should return 401 without valid token', async () => {
-      const token = await registerAndGetToken()
-      const createdTx = await createAndGetTransaction(token)
-      const newBody = {
-        amount: 100,
-      }
-
-      const res = await request(app)
-        .patch('/transactions/' + createdTx.id)
-        .send(newBody)
-
-      expect(res.status).toBe(401)
-      expect(res.body).toEqual({ error: 'Unauthorized' })
-    })
-
     it('should return 404 when transaction does not exist', async () => {
       const token = await registerAndGetToken()
       const newBody = {
@@ -362,6 +373,23 @@ describe('Transactions', () => {
   })
 
   describe('DELETE /transactions/:id', () => {
+    it('should return 401 without token', async () => {
+      const res = await request(app).delete('/transactions/some-id').send({})
+
+      expect(res.status).toBe(401)
+      expect(res.body.error).toBeDefined()
+    })
+
+    it('should return 401 for invalid token', async () => {
+      const invalidToken = 'Invalid'
+
+      const res = await request(app)
+        .delete('/transactions/some-id')
+        .set('Authorization', 'Bearer ' + invalidToken)
+
+      expect(res.status).toBe(401)
+    })
+
     it('should delete transaction and return 204', async () => {
       const token = await registerAndGetToken()
       const createdTx = await createAndGetTransaction(token)
