@@ -70,7 +70,10 @@ describe('Transactions', () => {
     describe('base list', () => {
       it('should return 200 and transaction list', async () => {
         const token = await registerAndGetToken()
-        const createdTx = await createAndGetTransaction(token)
+        const category = await createAndGetCategory(token, { name: 'Test' })
+        const createdTx = await createAndGetTransaction(token, {
+          categoryId: category.categoryId,
+        })
 
         const res = await request(app)
           .get('/transactions')
@@ -85,6 +88,7 @@ describe('Transactions', () => {
         expect(tx.id).toBe(createdTx.id)
         expect(tx.amount).toBe(createdTx.amount)
         expect(tx.type).toBe(createdTx.type)
+        expect(tx.category).toEqual({ name: category.name })
       })
     })
 

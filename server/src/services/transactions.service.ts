@@ -70,6 +70,13 @@ export async function getTransactions(
 
   const transactions = await prisma.transaction.findMany({
     where,
+    include: {
+      category: {
+        select: {
+          name: true,
+        },
+      },
+    },
     orderBy: {
       occurredAt: 'desc',
     },
