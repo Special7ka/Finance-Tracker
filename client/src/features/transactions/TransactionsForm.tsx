@@ -5,8 +5,11 @@ type Category = {
   id: string
   name: string
 }
+type Props = {
+  onTransactionCreated: () => Promise<void>
+}
 
-export const TransactionsForm = () => {
+export const TransactionsForm = ({ onTransactionCreated }: Props) => {
   const [amount, setAmount] = useState('')
   const [type, setType] = useState('')
   const [categoryId, setCategoryId] = useState('')
@@ -43,7 +46,7 @@ export const TransactionsForm = () => {
             categoryId: categoryId || null,
             occurredAt,
           })
-
+          onTransactionCreated()
           setAmount('')
           setCategoryId('')
           setOccurredAt('')

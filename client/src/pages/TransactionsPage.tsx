@@ -7,19 +7,19 @@ import type { Transaction } from '../types/transactions'
 export const TransactionsPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
 
-  useEffect(() => {
-    async function fetchData() {
-      const response = await api.get('/transactions')
-      setTransactions(response.data.transactions)
-    }
+  const onTransactionCreated = async () => {
+    const response = await api.get('/transactions')
+    setTransactions(response.data.transactions)
+  }
 
-    fetchData()
+  useEffect(() => {
+    onTransactionCreated()
   }, [])
 
   const navigate = useNavigate()
   return (
     <>
-      <TransactionsForm />
+      <TransactionsForm onTransactionCreated={onTransactionCreated} />
       <button
         onClick={() => {
           localStorage.removeItem('token')
