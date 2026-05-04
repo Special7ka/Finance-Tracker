@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client'
-
-type Category = {
-  id: string
-  name: string
-}
+import type { Category } from '../../types/categories'
 type Props = {
   onTransactionCreated: () => Promise<void>
 }
@@ -43,10 +39,10 @@ export const TransactionsForm = ({ onTransactionCreated }: Props) => {
           await api.post('/transactions', {
             amount: Number(amount),
             type,
-            categoryId: categoryId || null,
+            categoryId,
             occurredAt,
           })
-          onTransactionCreated()
+          await onTransactionCreated()
           setAmount('')
           setCategoryId('')
           setOccurredAt('')
@@ -67,7 +63,7 @@ export const TransactionsForm = ({ onTransactionCreated }: Props) => {
         value={categoryId}
         onChange={(e) => setCategoryId(e.target.value)}
       >
-        <option value="">Select category</option>
+        <option value="">Select </option>
 
         {categories.map((category) => (
           <option key={category.id} value={category.id}>

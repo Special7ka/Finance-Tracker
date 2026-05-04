@@ -7,6 +7,6 @@ export interface Transaction {
   amount: number
   type: TransactionType
   occurredAt: string
-  categoryId?: string
-  category?: Category | null
+  categoryId?: string | null
+  category: Category | null
 }

@@ -32,7 +32,11 @@ export const TransactionsPage = () => {
         {transactions.map((transaction) => {
           return (
             <div key={transaction.id}>
-              <span>{transaction.type}</span>-<span>{transaction.amount}</span>
+              <span>{transaction.type}</span>-<span>{transaction.amount}</span>-
+              <span>
+                {new Date(transaction.occurredAt).toLocaleDateString()}
+              </span>
+              -<span>{transaction.category?.name ?? 'No category'}</span>
             </div>
           )
         })}
