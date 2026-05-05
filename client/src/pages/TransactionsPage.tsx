@@ -18,6 +18,11 @@ export const TransactionsPage = () => {
     setEditingTransaction(null)
   }
 
+  const handleDelete = async (transaction: Transaction) => {
+    await api.delete('/transactions/' + transaction.id)
+    await onTransactionsChanged()
+  }
+
   useEffect(() => {
     onTransactionsChanged()
   }, [])
@@ -53,6 +58,13 @@ export const TransactionsPage = () => {
                 }}
               >
                 Edit
+              </button>
+              <button
+                onClick={() => {
+                  handleDelete(transaction)
+                }}
+              >
+                Delete
               </button>
             </div>
           )
