@@ -1,11 +1,18 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../api/client'
 import type { Category } from '../../types/categories'
+import type { Transaction } from '../../types/transactions'
 type Props = {
-  onTransactionCreated: () => Promise<void>
+  onTransactionsChanged: () => Promise<void>
+  editingTransaction?: Transaction | null
+  onEditFinished: () => void
 }
 
-export const TransactionsForm = ({ onTransactionCreated }: Props) => {
+export const TransactionsForm = ({
+  onTransactionsChanged,
+  editingTransaction,
+  onEditFinished,
+}: Props) => {
   const [amount, setAmount] = useState('')
   const [type, setType] = useState('')
   const [categoryId, setCategoryId] = useState('')
@@ -25,6 +32,21 @@ export const TransactionsForm = ({ onTransactionCreated }: Props) => {
     fetchCategories()
   }, [])
 
+  useEffect(() => {
+    if (!editingTransaction) {
+      return
+    }
+
+    setAmount(editingTransaction.amount.toString())
+    setType(editingTransaction.type)
+    setOccurredAt(editingTransaction.occurredAt.slice(0, 10))
+    if (editingTransaction.categoryId) {
+      setCategoryId(editingTransaction.categoryId)
+    } else {
+      setCategoryId('')
+    }
+  }, [editingTransaction])
+
   return (
     <form
       onSubmit={async (e) => {
@@ -35,19 +57,29 @@ export const TransactionsForm = ({ onTransactionCreated }: Props) => {
             alert('Fill required fields')
             return
           }
-
-          await api.post('/transactions', {
-            amount: Number(amount),
-            type,
-            categoryId,
-            occurredAt,
-          })
-          await onTransactionCreated()
+          if (editingTransaction) {
+            await api.patch('/transactions/' + editingTransaction.id, {
+              amount: Number(amount),
+              type,
+              categoryId,
+              occurredAt,
+            })
+            onEditFinished()
+            alert('Transaction updated')
+          } else {
+            await api.post('/transactions', {
+              amount: Number(amount),
+              type,
+              categoryId,
+              occurredAt,
+            })
+            alert('Transaction created')
+          }
+          await onTransactionsChanged()
           setAmount('')
           setCategoryId('')
           setOccurredAt('')
-
-          alert('Transaction created')
+          setType('')
         } catch (e) {
           console.log(e)
         }

@@ -6,20 +6,30 @@ import type { Transaction } from '../types/transactions'
 
 export const TransactionsPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [editingTransaction, setEditingTransaction] =
+    useState<Transaction | null>(null)
 
-  const onTransactionCreated = async () => {
+  const onTransactionsChanged = async () => {
     const response = await api.get('/transactions')
     setTransactions(response.data.transactions)
   }
 
+  const onEditFinished = () => {
+    setEditingTransaction(null)
+  }
+
   useEffect(() => {
-    onTransactionCreated()
+    onTransactionsChanged()
   }, [])
 
   const navigate = useNavigate()
   return (
     <>
-      <TransactionsForm onTransactionCreated={onTransactionCreated} />
+      <TransactionsForm
+        onTransactionsChanged={onTransactionsChanged}
+        editingTransaction={editingTransaction}
+        onEditFinished={onEditFinished}
+      />
       <button
         onClick={() => {
           localStorage.removeItem('token')
@@ -36,7 +46,14 @@ export const TransactionsPage = () => {
               <span>
                 {new Date(transaction.occurredAt).toLocaleDateString()}
               </span>
-              -<span>{transaction.category?.name ?? 'No category'}</span>
+              -<span>{transaction.category?.name ?? 'No category'}</span> -
+              <button
+                onClick={() => {
+                  setEditingTransaction(transaction)
+                }}
+              >
+                Edit
+              </button>
             </div>
           )
         })}
