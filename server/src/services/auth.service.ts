@@ -8,7 +8,7 @@ import { UserCredentials } from '../types/auth'
 export async function register(data: UserCredentials): Promise<string> {
   const prisma = getPrisma()
   const user = await prisma.user.findUnique({ where: { email: data.email } })
-  const userCategories = new Array()
+  const userCategories = []
   const cryptPass = await bcrypt.hash(data.password, 10)
 
   if (user) {

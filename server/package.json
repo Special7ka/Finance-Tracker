@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "test": "NODE_ENV=test vitest run",
     "test:watch": "NODE_ENV=test vitest",
-    "tree": "tree -I \"node_modules|dist|.git\" | xclip -selection clipboard"
+    "tree": "tree -I \"node_modules|dist|.git\" | xclip -selection clipboard",
+    "lint": "eslint ."
   },
   "author": "",
   "license": "ISC",
@@ -24,6 +25,7 @@
     "pg": "^8.19.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
@@ -38,6 +40,7 @@
     "supertest": "^7.2.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.59.3",
     "vitest": "^4.0.18"
   }
 }

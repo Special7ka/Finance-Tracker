@@ -5,8 +5,8 @@ import { getPrisma } from '../src/db/prisma'
 describe('Auth', () => {
   describe('POST /auth/register', () => {
     it('should register user and return token', async () => {
-      let email = 'test@test'
-      let password = 'testtest'
+      const email = 'test@test'
+      const password = 'testtest'
 
       const res = await request(app)
         .post('/auth/register')

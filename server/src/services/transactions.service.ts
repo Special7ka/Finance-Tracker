@@ -1,5 +1,5 @@
 import { getPrisma } from '../db/prisma'
-import { Prisma, PrismaClient, TransactionType } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { NotFoundError } from '../errors'
 import {
   GetTransactionValidated,
