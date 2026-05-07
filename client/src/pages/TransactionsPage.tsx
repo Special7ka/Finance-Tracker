@@ -3,12 +3,15 @@ import { TransactionsForm } from '../features/transactions/TransactionsForm'
 import { api } from '../api/client'
 import { useEffect, useState } from 'react'
 import type { Transaction, TransactionTypeFilter } from '../types/transactions'
+import type { Category } from '../types/categories'
 
 export const TransactionsPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null)
   const [typeFilter, setTypeFilter] = useState<TransactionTypeFilter>('')
+  const [categories, setCategories] = useState<Category[]>([])
+  const [categoryFilter, setCategoryFilter] = useState('')
 
   const onTransactionsChanged = async () => {
     const response = await api.get('/transactions')
@@ -24,8 +27,19 @@ export const TransactionsPage = () => {
     await onTransactionsChanged()
   }
 
+  const fetchCategories = async () => {
+    try {
+      const res = await api.get('/categories')
+      setCategories(res.data)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   useEffect(() => {
     onTransactionsChanged()
+
+    fetchCategories()
   }, [])
 
   const navigate = useNavigate()
@@ -35,6 +49,7 @@ export const TransactionsPage = () => {
         onTransactionsChanged={onTransactionsChanged}
         editingTransaction={editingTransaction}
         onEditFinished={onEditFinished}
+        categories={categories}
       />
       <button
         onClick={() => {
@@ -55,10 +70,27 @@ export const TransactionsPage = () => {
         <option value="INCOME">Income</option>
         <option value="EXPENSE">Expense</option>
       </select>
+      <select
+        value={categoryFilter}
+        onChange={(e) => {
+          setCategoryFilter(e.target.value)
+        }}
+      >
+        <option value="">All categories</option>
+        {categories.map((category) => {
+          return (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          )
+        })}
+      </select>
       <div>
         {transactions
           .filter(
-            (transaction) => !typeFilter || transaction.type === typeFilter,
+            (transaction) =>
+              (!typeFilter || transaction.type === typeFilter) &&
+              (!categoryFilter || transaction.categoryId === categoryFilter),
           )
           .map((transaction) => {
             return (

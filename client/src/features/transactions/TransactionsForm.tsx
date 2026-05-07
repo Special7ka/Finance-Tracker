@@ -6,31 +6,19 @@ type Props = {
   onTransactionsChanged: () => Promise<void>
   editingTransaction?: Transaction | null
   onEditFinished: () => void
+  categories: Category[]
 }
 
 export const TransactionsForm = ({
   onTransactionsChanged,
   editingTransaction,
   onEditFinished,
+  categories,
 }: Props) => {
   const [amount, setAmount] = useState('')
   const [type, setType] = useState('')
   const [categoryId, setCategoryId] = useState('')
   const [occurredAt, setOccurredAt] = useState('')
-  const [categories, setCategories] = useState<Category[]>([])
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await api.get('/categories')
-        setCategories(res.data)
-      } catch (e) {
-        console.log(e)
-      }
-    }
-
-    fetchCategories()
-  }, [])
 
   useEffect(() => {
     if (!editingTransaction) {
