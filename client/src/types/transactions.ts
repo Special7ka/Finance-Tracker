@@ -10,3 +10,5 @@ export interface Transaction {
   categoryId?: string | null
   category: Category | null
 }
+
+export type TransactionTypeFilter = TransactionType | ''
