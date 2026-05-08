@@ -12,9 +12,16 @@ export const TransactionsPage = () => {
   const [typeFilter, setTypeFilter] = useState<TransactionTypeFilter>('')
   const [categories, setCategories] = useState<Category[]>([])
   const [categoryFilter, setCategoryFilter] = useState('')
+  const [fromDateFilter, setFromDateFilter] = useState('')
+  const [toDateFilter, setToDateFilter] = useState('')
 
-  const onTransactionsChanged = async () => {
-    const response = await api.get('/transactions')
+  const onTransactionsChanged = async (fromDate?: string, toDate?: string) => {
+    const response = await api.get('/transactions', {
+      params: {
+        from: fromDate || undefined,
+        to: toDate || undefined,
+      },
+    })
     setTransactions(response.data.transactions)
   }
 
@@ -24,7 +31,7 @@ export const TransactionsPage = () => {
 
   const handleDelete = async (transaction: Transaction) => {
     await api.delete('/transactions/' + transaction.id)
-    await onTransactionsChanged()
+    await onTransactionsChanged(fromDateFilter, toDateFilter)
   }
 
   const fetchCategories = async () => {
@@ -85,6 +92,27 @@ export const TransactionsPage = () => {
           )
         })}
       </select>
+      <input
+        type="date"
+        value={fromDateFilter}
+        onChange={(e) => {
+          setFromDateFilter(e.target.value)
+        }}
+      />
+      <input
+        type="date"
+        value={toDateFilter}
+        onChange={(e) => {
+          setToDateFilter(e.target.value)
+        }}
+      />
+      <button
+        onClick={() => {
+          onTransactionsChanged(fromDateFilter, toDateFilter)
+        }}
+      >
+        Apply filters
+      </button>
       <div>
         {transactions
           .filter(
