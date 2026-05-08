@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import { register, login } from '../services/auth.service'
 import {
   registerController,
   loginController,

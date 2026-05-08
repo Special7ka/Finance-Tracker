@@ -1,7 +1,6 @@
 import { Prisma } from '@prisma/client'
 import { getPrisma } from '../db/prisma'
 import { GetSummaryValidated, SummaryByCategoryItem } from '../types/summary'
-import { TransactionType } from '@prisma/client'
 
 export const getSummary = async (
   userId: string,

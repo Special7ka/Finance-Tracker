@@ -28,7 +28,7 @@ export const authorization = (
 
     req.userId = decoded.userId
     next()
-  } catch (e) {
+  } catch {
     throw new UnauthorizedError('Unauthorized')
   }
 }

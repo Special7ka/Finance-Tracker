@@ -1,7 +1,6 @@
 import { GetSummaryValidated } from '../types/summary'
 import { BadRequestError } from '../errors'
 import { validateAndParseDate } from './date.validator'
-import { TransactionType } from '@prisma/client'
 
 export const validateGetSummary = (query: unknown): GetSummaryValidated => {
   const data: GetSummaryValidated = {}

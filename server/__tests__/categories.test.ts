@@ -4,6 +4,10 @@ import { DEFAULT_CATEGORIES } from '../src/constants/defaultCategories'
 import { registerAndGetToken } from './helpers/register'
 import { getFirstUserCategory } from './helpers/categories'
 
+type CategoryResponse = {
+  name: string
+}
+
 describe('Categories', () => {
   describe('GET /categories', () => {
     it('should return 401 without token', async () => {
@@ -19,8 +23,10 @@ describe('Categories', () => {
       const res = await request(app)
         .get('/categories')
         .set('Authorization', 'Bearer ' + token)
-      const responseNames = res.body.map((c: any) => c.name).sort()
-      const defaultNames = DEFAULT_CATEGORIES.map((c: any) => c.name).sort()
+      const responseNames = (res.body as CategoryResponse[])
+        .map((c) => c.name)
+        .sort()
+      const defaultNames = DEFAULT_CATEGORIES.map((c) => c.name).sort()
 
       expect(res.status).toBe(200)
       expect(Array.isArray(res.body)).toBe(true)

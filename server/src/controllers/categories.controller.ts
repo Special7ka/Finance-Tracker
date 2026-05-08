@@ -5,7 +5,6 @@ import {
   updateCategory,
   deleteCategory,
 } from '../services/categories.service'
-import { BadRequestError } from '../errors'
 import {
   validateCreateCategory,
   validateUpdateCategory,
