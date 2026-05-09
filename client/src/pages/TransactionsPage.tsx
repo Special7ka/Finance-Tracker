@@ -15,9 +15,16 @@ export const TransactionsPage = () => {
   const [fromDateFilter, setFromDateFilter] = useState('')
   const [toDateFilter, setToDateFilter] = useState('')
 
-  const onTransactionsChanged = async (fromDate?: string, toDate?: string) => {
+  const onTransactionsChanged = async (
+    typeFilter?: TransactionTypeFilter,
+    categoryFilter?: string,
+    fromDate?: string,
+    toDate?: string,
+  ) => {
     const response = await api.get('/transactions', {
       params: {
+        type: typeFilter || undefined,
+        categoryId: categoryFilter || undefined,
         from: fromDate || undefined,
         to: toDate || undefined,
       },
@@ -31,7 +38,12 @@ export const TransactionsPage = () => {
 
   const handleDelete = async (transaction: Transaction) => {
     await api.delete('/transactions/' + transaction.id)
-    await onTransactionsChanged(fromDateFilter, toDateFilter)
+    await onTransactionsChanged(
+      typeFilter,
+      categoryFilter,
+      fromDateFilter,
+      toDateFilter,
+    )
   }
 
   const fetchCategories = async () => {
@@ -108,44 +120,42 @@ export const TransactionsPage = () => {
       />
       <button
         onClick={() => {
-          onTransactionsChanged(fromDateFilter, toDateFilter)
+          onTransactionsChanged(
+            typeFilter,
+            categoryFilter,
+            fromDateFilter,
+            toDateFilter,
+          )
         }}
       >
         Apply filters
       </button>
       <div>
-        {transactions
-          .filter(
-            (transaction) =>
-              (!typeFilter || transaction.type === typeFilter) &&
-              (!categoryFilter || transaction.categoryId === categoryFilter),
+        {transactions.map((transaction) => {
+          return (
+            <div key={transaction.id}>
+              <span>{transaction.type}</span>-<span>{transaction.amount}</span>-
+              <span>
+                {new Date(transaction.occurredAt).toLocaleDateString()}
+              </span>
+              -<span>{transaction.category?.name ?? 'No category'}</span> -
+              <button
+                onClick={() => {
+                  setEditingTransaction(transaction)
+                }}
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => {
+                  handleDelete(transaction)
+                }}
+              >
+                Delete
+              </button>
+            </div>
           )
-          .map((transaction) => {
-            return (
-              <div key={transaction.id}>
-                <span>{transaction.type}</span>-
-                <span>{transaction.amount}</span>-
-                <span>
-                  {new Date(transaction.occurredAt).toLocaleDateString()}
-                </span>
-                -<span>{transaction.category?.name ?? 'No category'}</span> -
-                <button
-                  onClick={() => {
-                    setEditingTransaction(transaction)
-                  }}
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => {
-                    handleDelete(transaction)
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            )
-          })}
+        })}
       </div>
     </>
   )
