@@ -1,4 +1,32 @@
+import { useEffect, useState } from 'react'
+import { getSummary } from '../api/summary'
+import type { Summary } from '../types/summary'
+
 export const AnalyticsPage = () => {
+  const [summary, setSummary] = useState<Summary | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        const data = await getSummary()
+        setSummary(data)
+      } catch (e) {
+        console.log(e)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchSummary()
+  }, [])
+
+  if (loading) {
+    return <p>Loading...</p>
+  }
+  if (summary === null) {
+    return <p>Failed to load summary</p>
+  }
   return (
     <div>
       <header>
@@ -40,17 +68,17 @@ export const AnalyticsPage = () => {
         <div>
           <div>
             <h3>Total income</h3>
-            <p>$0.00</p>
+            <p>${summary.income.toFixed(2)}</p>
           </div>
 
           <div>
             <h3>Total expense</h3>
-            <p>$0.00</p>
+            <p>${summary.expense.toFixed(2)}</p>
           </div>
 
           <div>
             <h3>Balance</h3>
-            <p>$0.00</p>
+            <p>${summary.balance.toFixed(2)}</p>
           </div>
         </div>
       </section>
