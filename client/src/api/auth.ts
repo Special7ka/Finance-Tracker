@@ -1,4 +1,3 @@
-import { Meta } from 'react-router-dom'
 import { api } from './client'
 
 export const postAuth = async (
@@ -14,6 +13,7 @@ export const postAuth = async (
     })
     return res.data
   } catch (e) {
+    console.log(e)
     throw e
   }
 }
