@@ -23,9 +23,6 @@ export const getSummary = async (
   if (dateFilter.lte !== undefined || dateFilter.gte !== undefined) {
     where.occurredAt = dateFilter
   }
-  if (filters.type !== undefined) {
-    where.type = filters.type
-  }
 
   const userTransactions = await prisma.transaction.findMany({ where })
 
