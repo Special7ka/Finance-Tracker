@@ -23,6 +23,9 @@ export const getSummary = async (
   if (dateFilter.lte !== undefined || dateFilter.gte !== undefined) {
     where.occurredAt = dateFilter
   }
+  if (filters.type !== undefined) {
+    where.type = filters.type
+  }
 
   const userTransactions = await prisma.transaction.findMany({ where })
 
@@ -47,11 +50,22 @@ export const getSummaryByCategory = async (
   filters: GetSummaryValidated,
 ): Promise<SummaryByCategoryItem[]> => {
   const prisma = getPrisma()
+  const dateFilter: Prisma.DateTimeFilter = {}
+
   const where: Prisma.TransactionWhereInput = {
     userId: userId,
     type: filters.type ?? 'EXPENSE',
   }
 
+  if (filters.from !== undefined) {
+    dateFilter.gte = filters.from
+  }
+  if (filters.to !== undefined) {
+    dateFilter.lte = filters.to
+  }
+  if (dateFilter.lte !== undefined || dateFilter.gte !== undefined) {
+    where.occurredAt = dateFilter
+  }
   const userTransactionsByCategory = await prisma.transaction.groupBy({
     by: ['categoryId'],
     _sum: {
