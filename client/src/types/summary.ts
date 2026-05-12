@@ -3,3 +3,9 @@ export interface Summary {
   income: number
   balance: number
 }
+
+export type GetSummaryFilters = {
+  type?: string
+  from?: string
+  to?: string
+}

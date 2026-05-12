@@ -1,23 +1,26 @@
 import { useEffect, useState } from 'react'
 import { getSummary } from '../api/summary'
 import type { Summary } from '../types/summary'
+import type { GetSummaryFilters } from '../types/summary'
 
 export const AnalyticsPage = () => {
   const [summary, setSummary] = useState<Summary | null>(null)
   const [loading, setLoading] = useState(true)
+  const [fromDateFilter, setFromDateFilter] = useState('')
+  const [toDateFilter, setToDateFilter] = useState('')
+
+  const fetchSummary = async (filters?: GetSummaryFilters) => {
+    try {
+      const data = await getSummary(filters)
+      setSummary(data)
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchSummary = async () => {
-      try {
-        const data = await getSummary()
-        setSummary(data)
-      } catch (e) {
-        console.log(e)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchSummary()
   }, [])
 
@@ -39,26 +42,33 @@ export const AnalyticsPage = () => {
 
         <div>
           <div>
-            <label>Type</label>
-
-            <select>
-              <option value="">All types</option>
-              <option value="income">Income</option>
-              <option value="expense">Expense</option>
-            </select>
-          </div>
-
-          <div>
             <label>From</label>
-            <input type="date" />
+            <input
+              type="date"
+              value={fromDateFilter}
+              onChange={(e) => setFromDateFilter(e.target.value)}
+            />
           </div>
 
           <div>
             <label>To</label>
-            <input type="date" />
+            <input
+              type="date"
+              value={toDateFilter}
+              onChange={(e) => setToDateFilter(e.target.value)}
+            />
           </div>
 
-          <button>Apply filters</button>
+          <button
+            onClick={() => {
+              fetchSummary({
+                from: fromDateFilter || undefined,
+                to: toDateFilter || undefined,
+              })
+            }}
+          >
+            Apply filters
+          </button>
         </div>
       </section>
 
