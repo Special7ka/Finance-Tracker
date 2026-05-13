@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { getSummary } from '../api/summary'
-import type { Summary } from '../types/summary'
+import { getSummary, getSummaryByCategory } from '../api/summary'
+import type { Summary, SummaryByCategoryItem } from '../types/summary'
 import type { GetSummaryFilters } from '../types/summary'
 
 export const AnalyticsPage = () => {
@@ -8,6 +8,10 @@ export const AnalyticsPage = () => {
   const [loading, setLoading] = useState(true)
   const [fromDateFilter, setFromDateFilter] = useState('')
   const [toDateFilter, setToDateFilter] = useState('')
+  const [typeFilter, setTypeFilter] = useState('EXPENSE')
+  const [categoriesSummary, setCategoriesSummary] = useState<
+    SummaryByCategoryItem[]
+  >([])
 
   const fetchSummary = async (filters?: GetSummaryFilters) => {
     try {
@@ -20,8 +24,19 @@ export const AnalyticsPage = () => {
     }
   }
 
+  const fetchCategoriesSummary = async (filters?: GetSummaryFilters) => {
+    try {
+      const data = await getSummaryByCategory(filters)
+      setCategoriesSummary(data)
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setLoading(false)
+    }
+  }
   useEffect(() => {
     fetchSummary()
+    fetchCategoriesSummary({ type: 'EXPENSE' })
   }, [])
 
   if (loading) {
@@ -65,16 +80,20 @@ export const AnalyticsPage = () => {
                 from: fromDateFilter || undefined,
                 to: toDateFilter || undefined,
               })
+
+              fetchCategoriesSummary({
+                type: typeFilter as 'INCOME' | 'EXPENSE',
+                from: fromDateFilter || undefined,
+                to: toDateFilter || undefined,
+              })
             }}
           >
             Apply filters
           </button>
         </div>
       </section>
-
       <section>
         <h2>Summary</h2>
-
         <div>
           <div>
             <h3>Total income</h3>
@@ -92,9 +111,36 @@ export const AnalyticsPage = () => {
           </div>
         </div>
       </section>
-
       <section>
         <h2>Spending by category</h2>
+        <select
+          onChange={(e) => {
+            const type = e.target.value
+            setTypeFilter(type)
+            fetchCategoriesSummary({
+              type: type === '' ? undefined : (type as 'INCOME' | 'EXPENSE'),
+              from: fromDateFilter || undefined,
+              to: toDateFilter || undefined,
+            })
+          }}
+          value={typeFilter}
+        >
+          <option value="">All</option>
+          <option value="EXPENSE">Expense</option>
+          <option value="INCOME">Income</option>
+        </select>
+        {categoriesSummary.length === 0 ? (
+          <p>No data for selected filters</p>
+        ) : (
+          <ul>
+            {categoriesSummary.map((item) => (
+              <li key={item.categoryId ?? item.name}>
+                {item.name}: ${item.amount.toFixed(2)} (
+                {item.percentage.toFixed(2)}%)
+              </li>
+            ))}
+          </ul>
+        )}
 
         <div>Chart placeholder</div>
       </section>
