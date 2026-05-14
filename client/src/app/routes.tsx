@@ -5,6 +5,7 @@ import { TransactionsPage } from '../pages/TransactionsPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 import { ProtectedRoute } from '../components/ProtectedRoute'
 import { AppLayout } from '../components/AppLayout'
+import { AnalyticsPage } from '../pages/AnalyticsPage'
 
 export const AppRoutes = () => {
   const token = localStorage.getItem('token')
@@ -28,6 +29,16 @@ export const AppRoutes = () => {
           <ProtectedRoute>
             <AppLayout>
               <TransactionsPage />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <AnalyticsPage />
             </AppLayout>
           </ProtectedRoute>
         }

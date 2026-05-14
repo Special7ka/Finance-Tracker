@@ -18,6 +18,7 @@ export const AppLayout = ({ children }: Props) => {
         >
           Logout
         </button>
+        <Link to="/analytics">Analytics</Link>
       </header>
       <main>{children}</main>
     </>
