@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
 import { TransactionsForm } from '../features/transactions/TransactionsForm'
-import { api } from '../api/client'
 import { useEffect, useState } from 'react'
 import type { Transaction, TransactionTypeFilter } from '../types/transactions'
 import type { Category } from '../types/categories'
@@ -9,6 +8,7 @@ import LoadingState from '../components/LoadingState'
 import ErrorState from '../components/ErrorState'
 import EmptyState from '../components/EmptyState'
 import { getTransactions, deleteTransaction } from '../api/transactions'
+import { getCategories } from '../api/categories'
 
 export const TransactionsPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -42,8 +42,8 @@ export const TransactionsPage = () => {
   }
 
   const fetchCategories = async () => {
-    const res = await api.get('/categories')
-    setCategories(res.data)
+    const res = await getCategories()
+    setCategories(res)
   }
 
   useEffect(() => {
