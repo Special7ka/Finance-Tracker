@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { getSummary, getSummaryByCategory } from '../api/summary'
 import type { Summary, SummaryByCategoryItem } from '../types/summary'
 import type { GetSummaryFilters } from '../types/summary'
+import { LoadingState } from '../components/LoadingState'
 
 export const AnalyticsPage = () => {
   const [summary, setSummary] = useState<Summary | null>(null)
@@ -14,33 +15,33 @@ export const AnalyticsPage = () => {
   >([])
 
   const fetchSummary = async (filters?: GetSummaryFilters) => {
-    try {
-      const data = await getSummary(filters)
-      setSummary(data)
-    } catch (e) {
-      console.log(e)
-    } finally {
-      setLoading(false)
-    }
+    const data = await getSummary(filters)
+    setSummary(data)
   }
 
   const fetchCategoriesSummary = async (filters?: GetSummaryFilters) => {
-    try {
-      const data = await getSummaryByCategory(filters)
-      setCategoriesSummary(data)
-    } catch (e) {
-      console.log(e)
-    } finally {
-      setLoading(false)
-    }
+    const data = await getSummaryByCategory(filters)
+    setCategoriesSummary(data)
   }
   useEffect(() => {
-    fetchSummary()
-    fetchCategoriesSummary({ type: 'EXPENSE' })
+    const loadData = async () => {
+      try {
+        await Promise.all([
+          fetchSummary(),
+          fetchCategoriesSummary({ type: 'EXPENSE' }),
+        ])
+      } catch (e) {
+        console.log(e)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadData()
   }, [])
 
   if (loading) {
-    return <p>Loading...</p>
+    return <LoadingState />
   }
   if (summary === null) {
     return <p>Failed to load summary</p>

@@ -4,6 +4,7 @@ import { api } from '../api/client'
 import { useEffect, useState } from 'react'
 import type { Transaction, TransactionTypeFilter } from '../types/transactions'
 import type { Category } from '../types/categories'
+import { LoadingState } from '../components/LoadingState'
 
 export const TransactionsPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -14,6 +15,7 @@ export const TransactionsPage = () => {
   const [categoryFilter, setCategoryFilter] = useState('')
   const [fromDateFilter, setFromDateFilter] = useState('')
   const [toDateFilter, setToDateFilter] = useState('')
+  const [loading, setLoading] = useState(true)
 
   const onTransactionsChanged = async (
     typeFilter?: TransactionTypeFilter,
@@ -47,21 +49,29 @@ export const TransactionsPage = () => {
   }
 
   const fetchCategories = async () => {
-    try {
-      const res = await api.get('/categories')
-      setCategories(res.data)
-    } catch (e) {
-      console.log(e)
-    }
+    const res = await api.get('/categories')
+    setCategories(res.data)
   }
 
   useEffect(() => {
-    onTransactionsChanged()
+    const loadData = async () => {
+      try {
+        await Promise.all([fetchCategories(), onTransactionsChanged()])
+      } catch (e) {
+        console.log(e)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-    fetchCategories()
+    loadData()
   }, [])
 
   const navigate = useNavigate()
+
+  if (loading) {
+    return <LoadingState />
+  }
   return (
     <>
       <TransactionsForm
