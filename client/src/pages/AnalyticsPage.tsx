@@ -3,6 +3,7 @@ import { getSummary, getSummaryByCategory } from '../api/summary'
 import type { Summary, SummaryByCategoryItem } from '../types/summary'
 import type { GetSummaryFilters } from '../types/summary'
 import { LoadingState } from '../components/LoadingState'
+import { ErrorState } from '../components/ErrorState'
 
 export const AnalyticsPage = () => {
   const [summary, setSummary] = useState<Summary | null>(null)
@@ -13,6 +14,7 @@ export const AnalyticsPage = () => {
   const [categoriesSummary, setCategoriesSummary] = useState<
     SummaryByCategoryItem[]
   >([])
+  const [errorState, setErrorState] = useState<string | null>(null)
 
   const fetchSummary = async (filters?: GetSummaryFilters) => {
     const data = await getSummary(filters)
@@ -32,6 +34,7 @@ export const AnalyticsPage = () => {
         ])
       } catch (e) {
         console.log(e)
+        setErrorState('Failed to load summary data')
       } finally {
         setLoading(false)
       }
@@ -43,9 +46,13 @@ export const AnalyticsPage = () => {
   if (loading) {
     return <LoadingState />
   }
-  if (summary === null) {
-    return <p>Failed to load summary</p>
+  if (errorState) {
+    return <ErrorState message={errorState} />
   }
+  if (summary === null) {
+    return <ErrorState message="Failed to load summary" />
+  }
+
   return (
     <div>
       <header>

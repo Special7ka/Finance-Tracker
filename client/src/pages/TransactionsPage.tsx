@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import type { Transaction, TransactionTypeFilter } from '../types/transactions'
 import type { Category } from '../types/categories'
 import { LoadingState } from '../components/LoadingState'
+import { ErrorState } from '../components/ErrorState'
 
 export const TransactionsPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -16,6 +17,7 @@ export const TransactionsPage = () => {
   const [fromDateFilter, setFromDateFilter] = useState('')
   const [toDateFilter, setToDateFilter] = useState('')
   const [loading, setLoading] = useState(true)
+  const [errorState, setErrorState] = useState<string | null>(null)
 
   const onTransactionsChanged = async (
     typeFilter?: TransactionTypeFilter,
@@ -59,6 +61,7 @@ export const TransactionsPage = () => {
         await Promise.all([fetchCategories(), onTransactionsChanged()])
       } catch (e) {
         console.log(e)
+        setErrorState('Failed to load transactions data')
       } finally {
         setLoading(false)
       }
@@ -71,6 +74,9 @@ export const TransactionsPage = () => {
 
   if (loading) {
     return <LoadingState />
+  }
+  if (errorState) {
+    return <ErrorState message={errorState} />
   }
   return (
     <>
