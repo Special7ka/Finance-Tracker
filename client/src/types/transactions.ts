@@ -12,3 +12,10 @@ export interface Transaction {
 }
 
 export type TransactionTypeFilter = TransactionType | ''
+
+export interface GetTransactionsFilters {
+  type?: TransactionTypeFilter
+  categoryId?: string
+  from?: string
+  to?: string
+}

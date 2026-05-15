@@ -4,9 +4,11 @@ import { api } from '../api/client'
 import { useEffect, useState } from 'react'
 import type { Transaction, TransactionTypeFilter } from '../types/transactions'
 import type { Category } from '../types/categories'
+import type { GetTransactionsFilters } from '../types/transactions'
 import LoadingState from '../components/LoadingState'
 import ErrorState from '../components/ErrorState'
 import EmptyState from '../components/EmptyState'
+import { getTransactions, deleteTransaction } from '../api/transactions'
 
 export const TransactionsPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -20,21 +22,9 @@ export const TransactionsPage = () => {
   const [loading, setLoading] = useState(true)
   const [errorState, setErrorState] = useState<string | null>(null)
 
-  const onTransactionsChanged = async (
-    typeFilter?: TransactionTypeFilter,
-    categoryFilter?: string,
-    fromDate?: string,
-    toDate?: string,
-  ) => {
-    const response = await api.get('/transactions', {
-      params: {
-        type: typeFilter || undefined,
-        categoryId: categoryFilter || undefined,
-        from: fromDate || undefined,
-        to: toDate || undefined,
-      },
-    })
-    setTransactions(response.data.transactions)
+  const onTransactionsChanged = async (filters?: GetTransactionsFilters) => {
+    const response = await getTransactions(filters)
+    setTransactions(response)
   }
 
   const onEditFinished = () => {
@@ -42,13 +32,13 @@ export const TransactionsPage = () => {
   }
 
   const handleDelete = async (transaction: Transaction) => {
-    await api.delete('/transactions/' + transaction.id)
-    await onTransactionsChanged(
-      typeFilter,
-      categoryFilter,
-      fromDateFilter,
-      toDateFilter,
-    )
+    await deleteTransaction(transaction.id)
+    await onTransactionsChanged({
+      type: typeFilter,
+      categoryId: categoryFilter,
+      from: fromDateFilter,
+      to: toDateFilter,
+    })
   }
 
   const fetchCategories = async () => {
@@ -137,12 +127,12 @@ export const TransactionsPage = () => {
       />
       <button
         onClick={() => {
-          onTransactionsChanged(
-            typeFilter,
-            categoryFilter,
-            fromDateFilter,
-            toDateFilter,
-          )
+          onTransactionsChanged({
+            type: typeFilter,
+            categoryId: categoryFilter,
+            from: fromDateFilter,
+            to: toDateFilter,
+          })
         }}
       >
         Apply filters
