@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { api } from '../../api/client'
 import type { Category } from '../../types/categories'
-import type { Transaction } from '../../types/transactions'
+import type { Transaction, TransactionType } from '../../types/transactions'
+import { createTransaction, updateTransaction } from '../../api/transactions'
+
 type Props = {
   onTransactionsChanged: () => Promise<void>
   editingTransaction?: Transaction | null
@@ -16,7 +17,7 @@ export const TransactionsForm = ({
   categories,
 }: Props) => {
   const [amount, setAmount] = useState('')
-  const [type, setType] = useState('')
+  const [type, setType] = useState<TransactionType | ''>('')
   const [categoryId, setCategoryId] = useState('')
   const [occurredAt, setOccurredAt] = useState('')
 
@@ -46,7 +47,7 @@ export const TransactionsForm = ({
             return
           }
           if (editingTransaction) {
-            await api.patch('/transactions/' + editingTransaction.id, {
+            await updateTransaction(editingTransaction.id, {
               amount: Number(amount),
               type,
               categoryId,
@@ -55,7 +56,7 @@ export const TransactionsForm = ({
             onEditFinished()
             alert('Transaction updated')
           } else {
-            await api.post('/transactions', {
+            await createTransaction({
               amount: Number(amount),
               type,
               categoryId,
@@ -73,7 +74,10 @@ export const TransactionsForm = ({
         }
       }}
     >
-      <select value={type} onChange={(e) => setType(e.target.value)}>
+      <select
+        value={type}
+        onChange={(e) => setType(e.target.value as TransactionType | '')}
+      >
         <option value="">Select type of transaction</option>
         <option value="EXPENSE">Expense</option>
         <option value="INCOME">Income</option>

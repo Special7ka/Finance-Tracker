@@ -19,3 +19,10 @@ export interface GetTransactionsFilters {
   from?: string
   to?: string
 }
+
+export interface TransactionPayload {
+  amount: number
+  type: TransactionType
+  occurredAt: string
+  categoryId?: string | null
+}
