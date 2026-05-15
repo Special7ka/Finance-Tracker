@@ -5,17 +5,12 @@ export const postAuth = async (
   email: string,
   password: string,
 ) => {
-  try {
-    console.log(import.meta.env.VITE_API_URL)
-    const res = await api.post(url, {
-      email,
-      password,
-    })
-    return res.data
-  } catch (e) {
-    console.log(e)
-    throw e
-  }
+  console.log(import.meta.env.VITE_API_URL)
+  const res = await api.post(url, {
+    email,
+    password,
+  })
+  return res.data
 }
 
 export const loginApi = async (email: string, password: string) => {

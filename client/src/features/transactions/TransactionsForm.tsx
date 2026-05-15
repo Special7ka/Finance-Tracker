@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { Category } from '../../types/categories'
 import type { Transaction, TransactionType } from '../../types/transactions'
 import { createTransaction, updateTransaction } from '../../api/transactions'
+import getErrorMessage from '../../utils/getErrorMessage'
 
 type Props = {
   onTransactionsChanged: () => Promise<void>
@@ -70,7 +71,7 @@ export const TransactionsForm = ({
           setOccurredAt('')
           setType('')
         } catch (e) {
-          console.log(e)
+          alert(getErrorMessage(e))
         }
       }}
     >

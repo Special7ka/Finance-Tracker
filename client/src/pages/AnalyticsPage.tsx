@@ -5,6 +5,7 @@ import type { GetSummaryFilters } from '../types/summary'
 import LoadingState from '../components/LoadingState'
 import ErrorState from '../components/ErrorState'
 import EmptyState from '../components/EmptyState'
+import getErrorMessage from '../utils/getErrorMessage'
 
 export const AnalyticsPage = () => {
   const [summary, setSummary] = useState<Summary | null>(null)
@@ -34,8 +35,7 @@ export const AnalyticsPage = () => {
           fetchCategoriesSummary({ type: 'EXPENSE' }),
         ])
       } catch (e) {
-        console.log(e)
-        setErrorState('Failed to load summary data')
+        setErrorState(getErrorMessage(e))
       } finally {
         setLoading(false)
       }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Navigate } from 'react-router-dom'
 import { registerApi } from '../api/auth'
+import getErrorMessage from '../utils/getErrorMessage'
 
 export const RegisterPage = () => {
   const [email, setEmail] = useState('')
@@ -28,7 +29,7 @@ export const RegisterPage = () => {
             localStorage.setItem('token', data.token)
             navigate('/transactions', { replace: true })
           } catch (e) {
-            console.log(e)
+            alert(getErrorMessage(e))
           }
         }}
       >
