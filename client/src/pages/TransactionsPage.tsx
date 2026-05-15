@@ -4,8 +4,9 @@ import { api } from '../api/client'
 import { useEffect, useState } from 'react'
 import type { Transaction, TransactionTypeFilter } from '../types/transactions'
 import type { Category } from '../types/categories'
-import { LoadingState } from '../components/LoadingState'
-import { ErrorState } from '../components/ErrorState'
+import LoadingState from '../components/LoadingState'
+import ErrorState from '../components/ErrorState'
+import EmptyState from '../components/EmptyState'
 
 export const TransactionsPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -147,31 +148,36 @@ export const TransactionsPage = () => {
         Apply filters
       </button>
       <div>
-        {transactions.map((transaction) => {
-          return (
-            <div key={transaction.id}>
-              <span>{transaction.type}</span>-<span>{transaction.amount}</span>-
-              <span>
-                {new Date(transaction.occurredAt).toLocaleDateString()}
-              </span>
-              -<span>{transaction.category?.name ?? 'No category'}</span> -
-              <button
-                onClick={() => {
-                  setEditingTransaction(transaction)
-                }}
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => {
-                  handleDelete(transaction)
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          )
-        })}
+        {transactions.length === 0 ? (
+          <EmptyState message="No transactions found for selected filters" />
+        ) : (
+          transactions.map((transaction) => {
+            return (
+              <div key={transaction.id}>
+                <span>{transaction.type}</span>-
+                <span>{transaction.amount}</span>-
+                <span>
+                  {new Date(transaction.occurredAt).toLocaleDateString()}
+                </span>
+                -<span>{transaction.category?.name ?? 'No category'}</span> -
+                <button
+                  onClick={() => {
+                    setEditingTransaction(transaction)
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => {
+                    handleDelete(transaction)
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            )
+          })
+        )}
       </div>
     </>
   )

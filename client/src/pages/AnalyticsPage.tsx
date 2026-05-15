@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { getSummary, getSummaryByCategory } from '../api/summary'
 import type { Summary, SummaryByCategoryItem } from '../types/summary'
 import type { GetSummaryFilters } from '../types/summary'
-import { LoadingState } from '../components/LoadingState'
-import { ErrorState } from '../components/ErrorState'
+import LoadingState from '../components/LoadingState'
+import ErrorState from '../components/ErrorState'
+import EmptyState from '../components/EmptyState'
 
 export const AnalyticsPage = () => {
   const [summary, setSummary] = useState<Summary | null>(null)
@@ -138,7 +139,7 @@ export const AnalyticsPage = () => {
           <option value="INCOME">Income</option>
         </select>
         {categoriesSummary.length === 0 ? (
-          <p>No data for selected filters</p>
+          <EmptyState message="No data for selected filters" />
         ) : (
           <ul>
             {categoriesSummary.map((item) => (
