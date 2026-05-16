@@ -3,8 +3,8 @@ import { LoginPage } from '../pages/LoginPage'
 import { RegisterPage } from '../pages/RegisterPage'
 import { TransactionsPage } from '../pages/TransactionsPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
-import { ProtectedRoute } from '../components/ProtectedRoute'
-import { AppLayout } from '../components/AppLayout'
+import { ProtectedRoute } from '../components/layout/ProtectedRoute'
+import { AppLayout } from '../components/layout/AppLayout'
 import { AnalyticsPage } from '../pages/AnalyticsPage'
 
 export const AppRoutes = () => {

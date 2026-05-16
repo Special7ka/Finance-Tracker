@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { getSummary, getSummaryByCategory } from '../api/summary'
 import type { Summary, SummaryByCategoryItem } from '../types/summary'
 import type { GetSummaryFilters } from '../types/summary'
-import LoadingState from '../components/LoadingState'
-import ErrorState from '../components/ErrorState'
-import EmptyState from '../components/EmptyState'
+import LoadingState from '../components/states/LoadingState'
+import ErrorState from '../components/states/ErrorState'
+import EmptyState from '../components/states/EmptyState'
 import getErrorMessage from '../utils/getErrorMessage'
 
 export const AnalyticsPage = () => {
