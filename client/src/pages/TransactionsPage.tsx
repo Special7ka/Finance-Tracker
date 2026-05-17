@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom'
 import { TransactionsForm } from '../features/transactions/TransactionsForm'
 import { useEffect, useState } from 'react'
 import type { Transaction, TransactionTypeFilter } from '../types/transactions'
@@ -6,10 +5,11 @@ import type { Category } from '../types/categories'
 import type { GetTransactionsFilters } from '../types/transactions'
 import LoadingState from '../components/states/LoadingState'
 import ErrorState from '../components/states/ErrorState'
-import EmptyState from '../components/states/EmptyState'
 import { getTransactions, deleteTransaction } from '../api/transactions'
 import { getCategories } from '../api/categories'
 import getErrorMessage from '../utils/getErrorMessage'
+import TransactionsFilters from '../features/transactions/TransactionsFilters'
+import TransactionsList from '../features/transactions/TransactionsList'
 
 export const TransactionsPage = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -42,6 +42,11 @@ export const TransactionsPage = () => {
     })
   }
 
+  const handleEdit = (transaction: Transaction) => {
+    setEditingTransaction(transaction)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   const fetchCategories = async () => {
     const res = await getCategories()
     setCategories(res)
@@ -61,14 +66,13 @@ export const TransactionsPage = () => {
     loadData()
   }, [])
 
-  const navigate = useNavigate()
-
   if (loading) {
     return <LoadingState />
   }
   if (errorState) {
     return <ErrorState message={errorState} />
   }
+
   return (
     <>
       <TransactionsForm
@@ -77,98 +81,25 @@ export const TransactionsPage = () => {
         onEditFinished={onEditFinished}
         categories={categories}
       />
-      <button
-        onClick={() => {
-          localStorage.removeItem('token')
-          navigate('/')
-        }}
-      >
-        Delete token
-      </button>
-      <b />
-      <select
-        value={typeFilter}
-        onChange={(e) => {
-          setTypeFilter(e.target.value as TransactionTypeFilter)
-        }}
-      >
-        <option value="">All</option>
-        <option value="INCOME">Income</option>
-        <option value="EXPENSE">Expense</option>
-      </select>
-      <select
-        value={categoryFilter}
-        onChange={(e) => {
-          setCategoryFilter(e.target.value)
-        }}
-      >
-        <option value="">All categories</option>
-        {categories.map((category) => {
-          return (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          )
-        })}
-      </select>
-      <input
-        type="date"
-        value={fromDateFilter}
-        onChange={(e) => {
-          setFromDateFilter(e.target.value)
-        }}
+
+      <TransactionsFilters
+        typeFilter={typeFilter}
+        setTypeFilter={setTypeFilter}
+        categoryFilter={categoryFilter}
+        setCategoryFilter={setCategoryFilter}
+        fromDateFilter={fromDateFilter}
+        setFromDateFilter={setFromDateFilter}
+        toDateFilter={toDateFilter}
+        setToDateFilter={setToDateFilter}
+        categories={categories}
+        onTransactionsChanged={onTransactionsChanged}
       />
-      <input
-        type="date"
-        value={toDateFilter}
-        onChange={(e) => {
-          setToDateFilter(e.target.value)
-        }}
+
+      <TransactionsList
+        transactions={transactions}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
       />
-      <button
-        onClick={() => {
-          onTransactionsChanged({
-            type: typeFilter,
-            categoryId: categoryFilter,
-            from: fromDateFilter,
-            to: toDateFilter,
-          })
-        }}
-      >
-        Apply filters
-      </button>
-      <div>
-        {transactions.length === 0 ? (
-          <EmptyState message="No transactions found for selected filters" />
-        ) : (
-          transactions.map((transaction) => {
-            return (
-              <div key={transaction.id}>
-                <span>{transaction.type}</span>-
-                <span>{transaction.amount}</span>-
-                <span>
-                  {new Date(transaction.occurredAt).toLocaleDateString()}
-                </span>
-                -<span>{transaction.category?.name ?? 'No category'}</span> -
-                <button
-                  onClick={() => {
-                    setEditingTransaction(transaction)
-                  }}
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => {
-                    handleDelete(transaction)
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            )
-          })
-        )}
-      </div>
     </>
   )
 }
